@@ -1,0 +1,19 @@
+<div class="login-container">
+  <form class="form-signin">
+    <div class="text-center mb-4">
+      <i class="fa fa-sign-in fa-fw login-page-signin-icon"></i>
+    </div>
+
+    <div class="form-group">
+      <label for="inputEmail">Username</label>
+      <input type="text" name="username" class="form-control" [(ngModel)]="user.username" placeholder="Username" required autofocus>
+    </div>
+
+    <div class="form-group">
+      <label for="inputPassword">Password</label>
+      <input type="password" name="password" class="form-control" [(ngModel)]="user.password" placeholder="Password" required>
+    </div>
+
+    <button class="btn btn-lg btn-success btn-block login-page-signin" (click)="signin()" type="submit">Sign in</button>
+  </form>
+</div>

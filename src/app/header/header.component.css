@@ -1,0 +1,11 @@
+.header-login-link, .header-brand-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.5rem;
+  word-break: break-word;
+}
+.header-icon {
+  font-size: 1.5rem;
+  color: #28a745;/*#0266c8 - blue*/
+  margin-right: 10px;
+}

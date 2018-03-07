@@ -1,0 +1,27 @@
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar fixed-top bg-dark">
+  	<div class="container">
+  		<div class="col">
+	    	<a class="header-brand-link" href="/">
+	    		<i class="fa fa-home fa-fw header-icon"></i>YLait Farm
+	    	</a>
+		</div>
+	    <div class="col text-right" *ngIf="!profile.isLoggedIn()">
+	    	<a class="header-login-link" href="/login">
+	    		<i class="fa fa-sign-in fa-fw header-icon"></i>Login
+	    	</a>
+	    </div>
+	    <div class="col text-right" *ngIf="profile.isLoggedIn()">
+	    	<a class="header-login-link" href="/login">
+	    		<i class="fa fa-user-circle fa-fw header-icon"></i>{{profile.getUsername()}}
+	    	</a>
+	    </div>
+	    <!--div>
+	    	<a class="header-login-link" href="/login">
+	    		<i class="fa fa-user-circle fa-fw header-icon"></i> Login
+	    	</a>
+	    </div--> 
+	</div>
+  </nav>
+</header>
