@@ -1,6 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ProfileService } from '../services/profile.service';
+import { Component, OnInit, Input, ViewChild} from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-login',
@@ -8,19 +10,29 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
-  constructor(private profile: ProfileService, private router: Router) { }
-
-  user: any = {
-  	username: '',
-  	password: ''	
+  private user: any = {
+    username: '',
+    password: ''  
   };
+  private callInProgress: boolean = false;
+
+  @ViewChild('signinForm')
+  private signinForm: NgForm;
+
+  constructor(private api: ApiService, private router: Router) { }
 
   ngOnInit() {
   }
 
   signin() {
-      this.profile.signin(this.user);
+      this.callInProgress = true;
+      this.api.signin(this.user, () => {
+        this.callInProgress = false;
+      });
+  }
+
+  toggleMenu() {
+      console.log("admin");
   }
 
 }

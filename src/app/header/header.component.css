@@ -9,3 +9,27 @@
   color: #28a745;/*#0266c8 - blue*/
   margin-right: 10px;
 }
+.icon-active{
+  color: #fff !important;
+}
+@media (min-width: 768px) { 
+  .header-name {
+    display: inline-block !important;
+    margin-right: 10px;
+  } 
+}
+
+.navbarmenu {
+	margin-top: 52px;
+	background-color: #e9ecef;
+	height: auto;
+	text-align: center;
+}
+.navbarmenu-item {
+	margin: 10px 0px;
+}
+.navbarmenu-link {
+	font-size: 1.0rem;
+	text-decoration: none;
+	color: #212529;
+}

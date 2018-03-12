@@ -13,6 +13,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^5.2.0",
+    "@angular/cdk": "^5.2.4",
     "@angular/common": "^5.2.0",
     "@angular/compiler": "^5.2.0",
     "@angular/core": "^5.2.0",
@@ -27,6 +28,7 @@
     "core-js": "^2.4.1",
     "express": "^4.16.2",
     "font-awesome": "^4.7.0",
+    "localtunnel": "^1.8.3",
     "moment": "^2.21.0",
     "mongodb": "^3.0.3",
     "ngx-bootstrap": "^2.0.2",

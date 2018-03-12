@@ -2,26 +2,58 @@
   <!-- Fixed navbar -->
   <nav class="navbar fixed-top bg-dark">
   	<div class="container">
-  		<div class="col">
-	    	<a class="header-brand-link" href="/">
-	    		<i class="fa fa-home fa-fw header-icon"></i>YLait Farm
+  		<div>
+	    	<a class="header-brand-link" routerLink="/" (click)="hideMenuNav()">
+	    		<i class="fa fa-home fa-fw header-icon"></i>
+	    		<span>YLait Farm</span>
 	    	</a>
 		</div>
-	    <div class="col text-right" *ngIf="!profile.isLoggedIn()">
-	    	<a class="header-login-link" href="/login">
-	    		<i class="fa fa-sign-in fa-fw header-icon"></i>Login
+	    <div *ngIf="!userData.username">
+	    	<a class="header-login-link" routerLink="/login">
+	    		<i class="fa fa-sign-in fa-fw header-icon"></i>
+	    		<span>Login</span>
 	    	</a>
 	    </div>
-	    <div class="col text-right" *ngIf="profile.isLoggedIn()">
-	    	<a class="header-login-link" href="/login">
-	    		<i class="fa fa-user-circle fa-fw header-icon"></i>{{profile.getUsername()}}
+	    <div *ngIf="userData.username" id="menublock">
+	    	<a class="header-login-link" href="javascript:void(0)">
+	    		<i class="fa fa-user-circle fa-fw header-icon" [ngClass]="{'icon-active': isUserNavMenuOpen}" (click)="toggleUserNavMenu()"></i>
+	    		<span class="d-none d-md-block header-name" (click)="toggleUserNavMenu()">{{userData.username}}</span>
+	    		<i class="fa fa-bars fa-fw header-icon" [ngClass]="{'icon-active': isPageNavMenuOpen}" (click)="togglePageNavMenu()"></i>
 	    	</a>
 	    </div>
-	    <!--div>
-	    	<a class="header-login-link" href="/login">
-	    		<i class="fa fa-user-circle fa-fw header-icon"></i> Login
-	    	</a>
-	    </div--> 
 	</div>
   </nav>
+  <div *ngIf="isUserNavMenuOpen" class="navbarmenu fixed-top">
+  	<div class="container">
+  		<div class="row">
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/dashboard" (click)="hideMenuNav()">Dashboard</a>
+	  		</div>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/config" (click)="hideMenuNav()">Config</a>
+	  		</div>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/createUser" (click)="hideMenuNav()">Create User</a>
+	  		</div>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
+	  			<a class="navbarmenu-link" href="javascript:void(0)" (click)="logout()">Logout</a>
+	  		</div>
+	  	</div>
+	</div>
+  </div>
+  <div *ngIf="isPageNavMenuOpen" class="navbarmenu fixed-top">
+  	<div class="container">
+  		<div class="row">
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/investment" (click)="hideMenuNav()">Investments</a>
+	  		</div>
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/transaction" (click)="hideMenuNav()">Transactions</a>
+	  		</div>
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
+	  			<a class="navbarmenu-link" routerLink="/data-entry" (click)="hideMenuNav()">Data Entry</a>
+	  		</div>
+	  	</div>
+	</div>
+  </div>
 </header>

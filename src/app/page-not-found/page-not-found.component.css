@@ -1,6 +1,10 @@
 .pnf-container {
-  margin: 60px 0px;
-  padding: 15% 0;
+	  margin: 20px 0px 100px;
+}
+@media (min-width: 992px) { 
+	.pnf-container {
+	  margin: 60px 0px 100px;
+	}
 }
 .pnf-content {
   width: 100%;

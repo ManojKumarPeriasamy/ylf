@@ -1,6 +1,14 @@
 <app-header></app-header>
 
 <main role="main" class="body-container container">
+	<div *ngIf="isAlertPresent" class="alertMessage">
+		<div *ngIf="alert.type == 'SUCCESS'" class="alert alert-success" role="alert">
+		  {{alert.message}}
+		</div>
+		<div *ngIf="alert.type == 'ERROR'" class="alert alert-danger" role="alert">
+		  {{alert.message}}
+		</div>
+	</div>
     <router-outlet></router-outlet>
 </main>
 

@@ -9,12 +9,18 @@ console.log("Request Handler Initialised , Loaded dependencies");
 
 module.exports = {
 	addUser: function(req, res) {
-		console.log("REqHan :: Inside Add User call");
+		console.log("ReqHan :: Inside Add User call");
 		dataModel.userDataModel(req.body.userData, function(modelErr, userData) {
-			if(modelErr) return res.json(dataModel.errorResponse(modelErr));
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
 
 			dbHandlers.addUser(userData, function(dberr, users) {
-				if(dberr) return res.json(dataModel.errorResponse(dberr));
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
 
 				res.json(dataModel.successResponse(users));
 			});
@@ -23,9 +29,15 @@ module.exports = {
 
 	signin: function(req, res) {
 		if(req.body.username) {
-			dbHandlers.findUser({"username" : req.body.username}, function(dberr, userInfo) {
-				if(dberr) return res.json(dataModel.errorResponse(dberr));
-				if(!userInfo) return res.json(dataModel.errorResponse("UserNotFound"));
+			console.log("ReqHan :: signin call initiated for user " + req.body.username);
+			dbHandlers.findUser({"_id" : req.body.username.toLowerCase()}, function(dberr, userInfo) {
+				if(dberr) {
+					res.json(dataModel.errorResponse("Something went wrong, Please try again later"));
+					return;
+				} else if(!userInfo) {
+					res.json(dataModel.errorResponse("Authentication failed. please check username and password"));
+					return;
+				}
 				util.comparePassword(req.body.password, userInfo.password, function(err, isMatch) {
 					console.log(userInfo);
 					if (isMatch && !err) {
@@ -38,14 +50,52 @@ module.exports = {
           				}
           				res.json(dataModel.successResponse(response));
         			} else {
-          				res.json({success: false, msg: 'Authentication failed. Validate username and passowrd'});
+          				res.json(dataModel.errorResponse("Authentication failed. please check username and password"));
         			}
 						
 				});
 			});
 		} else {
-			res.json(dataModel.errorResponse("Authentication failed. Validate username and passowrd"));
+			res.json(dataModel.errorResponse("Authentication failed. please check username and passowrd"));
 		}
+	},
+
+	addInvestment: function(req, res) {
+		console.log("ReqHan :: Inside Add Investment call");
+		dataModel.investmentDataModel(req.body.investmentData, function(modelErr, investmentData) {
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
+
+			dbHandlers.addTransaction(investmentData, function(dberr, response) {
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
+
+				res.json(dataModel.successResponse(response));
+			});
+		})
+	},
+
+	addTransaction: function(req, res) {
+		console.log("ReqHan :: Inside Transaction call");
+		dataModel.transactionDataModel(req.body.transactionData, function(modelErr, transactionData) {
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
+
+			dbHandlers.addTransaction(transactionData, function(dberr, response) {
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
+
+				res.json(dataModel.successResponse(response));
+			});
+		})
 	}
 
 }

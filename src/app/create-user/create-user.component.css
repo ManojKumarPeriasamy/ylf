@@ -1,0 +1,16 @@
+.create-user-container {
+    margin: 20px 0px 100px;
+}
+@media (min-width: 992px) {
+  .create-user-container {
+    margin: 60px 50px 100px;
+  }
+}
+
+.create-user-icon {
+	font-size: 6rem;
+	color: #28a745;
+}
+.create-user-btn {
+	margin-top: 2rem;
+}

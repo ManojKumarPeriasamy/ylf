@@ -1,19 +1,21 @@
 <div class="login-container">
-  <form class="form-signin">
+  <form #signinForm="ngForm" (ngSubmit)="signin()" class="form-signin">
     <div class="text-center mb-4">
       <i class="fa fa-sign-in fa-fw login-page-signin-icon"></i>
     </div>
 
     <div class="form-group">
-      <label for="inputEmail">Username</label>
-      <input type="text" name="username" class="form-control" [(ngModel)]="user.username" placeholder="Username" required autofocus>
+      <label for="inputUsername">Username</label>
+      <input type="text" name="username" id="inputUsername" class="form-control" #username="ngModel" [(ngModel)]="user.username" placeholder="Username" ngModel required minlength="4" maxlength="20" pattern="[a-zA-Z]*" autofocus>
+      <field-error [control]="username" customerror="Only alphabets allowed with no spaces"></field-error>
     </div>
 
     <div class="form-group">
       <label for="inputPassword">Password</label>
-      <input type="password" name="password" class="form-control" [(ngModel)]="user.password" placeholder="Password" required>
+      <input type="password" name="password" id="inputPassword" class="form-control" #password="ngModel" [(ngModel)]="user.password" placeholder="Password" ngModel minlength="8" maxlength="20" required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_])[A-Za-z\d!@#$%^&*()_]{8,}$">
+      <field-error [control]="password" customerror="Should contain atleast one letter, one digit and one special character in !@#$%_^&*()"></field-error>
     </div>
 
-    <button class="btn btn-lg btn-success btn-block login-page-signin" (click)="signin()" type="submit">Sign in</button>
+    <button class="btn btn-lg btn-success btn-block login-page-signin" [disabled]="signinForm.invalid || callInProgress" type="submit"><i class='fa fa-spinner fa-spin' *ngIf="callInProgress"></i>{{callInProgress ? ' Signing In' : 'Sign In'}}</button>
   </form>
 </div>

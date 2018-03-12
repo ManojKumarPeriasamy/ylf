@@ -1,0 +1,8 @@
+<div *ngIf="shouldShowErrors()">
+  <div class="ylf-field-error" *ngFor="let error of listOfErrors(); let first = first">
+  	<div *ngIf="first">
+  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
+  		<span>{{error}}</span>
+  	</div>
+  </div>
+</div>

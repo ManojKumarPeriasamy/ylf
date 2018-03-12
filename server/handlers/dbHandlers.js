@@ -13,26 +13,41 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
     console.log("Successfully connected to MongoDB server - HOST: " + config.mongodbHost + ', Port: ' + config.mongodbConnectionPort + ', DB : ' + config.mongodbName);
     
     dbHook.findUser = function(query, cb) {
-        console.log("DbHAnd :: Inside Find User")
+        console.log("DbHandler :: Inside Find User");
         db.collection('users').findOne(query, function(err, user){
-            if(err) cb(err);
-
+            if(err) {
+                cb(err);
+                return;
+            }
             cb(null, user);
         })
     };
 
-    dbHook.addUser= function(userData, cb) {
-        console.log("DbHAnd :: Inside Add User")
+    dbHook.addUser = function(userData, cb) {
+        console.log("DbHandler :: Inside Add User")
         db.collection('users').insertOne(userData, function(err, res) {
-            if(err) cb(err);
+            if(err) {
+                cb(err);
+                return;
+            }
+            cb(null, res);
+        })
+    };
 
+    dbHook.addTransaction = function(investmentData, cb) {
+        console.log("DbHandler :: Inside Investment User")
+        db.collection('transactions').insertOne(investmentData, function(err, res) {
+            if(err) {
+                cb(err);
+                return;
+            }
             cb(null, res);
         })
     };
 
     dbHook.updateUser = function(query, updateInfo, cb) {
 
-    }
+    };
 });
 
 module.exports = dbHook;

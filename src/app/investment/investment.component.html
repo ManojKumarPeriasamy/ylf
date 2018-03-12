@@ -1,0 +1,142 @@
+<div class="investment-container">
+  <form #investmentForm="ngForm" (ngSubmit)="addInvestment()" class="form-create-user">
+    <div class="text-center mb-4">
+      <i class="fa fa-arrow-down fa-fw investment-icon"></i>
+      <i class="fa fa-money fa-fw investment-icon"></i>
+      <i class="fa fa-arrow-down fa-fw investment-icon"></i>
+    </div>
+    <div class="row">
+	    <div class="col-xs-12 col-md-6 form-group">
+	        <label for="inputType">Investment Type</label>
+	      	<select class="custom-select" id="inputType" name="type" [(ngModel)]="newInvestmentData.type" (ngModelChange)="typeChanged()">
+			    <option *ngFor="let type of investmentTypes" value="{{type}}">{{type}}</option>
+			</select>
+	    </div>
+	    <div class="col-xs-12 col-md-6 form-group">
+	      <label for="inputName">Investment Source</label>
+	      <input type="text" name="name" id="inputName" class="form-control" #name="ngModel" [(ngModel)]="newInvestmentData.name" placeholder="Investment Source Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*">
+	      <field-error [control]="name" customerror="Only characters, space and - allowed"></field-error>
+	    </div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-md-6 form-group">
+			<label for="inputAmount">Investment Amount</label>
+			<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newInvestmentData.amount" placeholder="Investment Amount" ngModel required pattern="[0-9]*$">
+			<field-error [control]="amount" customerror="Numbers Only !! Please check"></field-error>
+	    </div>
+	    <div class="col-xs-12 col-md-6 form-group">
+	        <label>Invested On</label>
+	      	<div class="input-group">
+	      		<input type="text" name="date" class="form-control col-4" [(ngModel)]="newInvestmentData.eventOn.date" pattern="[0-9]{2,2}$" ngModel #date="ngModel"  placeholder="Date" required>
+			  	<div class="input-group-prepend">
+			    	<span class="input-group-text">/</span>
+			  	</div>
+			  	<input type="text" name="month" class="form-control col-4" [(ngModel)]="newInvestmentData.eventOn.month" pattern="[0-9]{2,2}$" ngModel #month="ngModel" placeholder="Month" required>
+			  	<div class="input-group-prepend">
+			    	<span class="input-group-text">/</span>
+			  	</div>
+			  	<input type="text" name="year" class="form-control col-4" [(ngModel)]="newInvestmentData.eventOn.year" pattern="[0-9]{4,4}$" ngModel #year="ngModel" placeholder="Year" required>
+			</div>
+			<field-error [control]="date" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+			<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+			<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-md-6 form-group">
+			<label for="inputPurpose">Investment Purpose</label>
+			<input type="text" name="purpose" id="inputPurpose" class="form-control" #purpose="ngModel" [(ngModel)]="newInvestmentData.purpose" placeholder="Investment Purpose" ngModel required>
+			<field-error [control]="purpose" customerror="Numbers Only !! Please check"></field-error>
+	    </div>
+	</div>
+
+
+	<hr *ngIf="showLoanInfo">
+	<div *ngIf="showLoanInfo">
+		<h3>Loan Info</h3>
+		<div class="row">
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label for="inputStatus">Loan Status</label>
+		      	<select class="custom-select" id="inputStatus" name="status" [(ngModel)]="loanDetail.loanStatus">
+				    <option *ngFor="let status of loanStatus" value="{{status}}">{{status}}</option>
+				</select>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+		      <label for="inputRepayAmount">Repay Amount</label>
+		      <input type="email" name="repayAmount" id="inputRepayAmount" class="form-control" #repayamount="ngModel" [(ngModel)]="loanDetail.amountBalance" (ngModelChange)="calcualteEMIAmount()" placeholder="Amount to Repay for Loan" ngModel required pattern="[0-9]*">
+		      <field-error [control]="name" customerror="Only Numbers!!!"></field-error>
+		    </div>
+		</div>
+		<div class="row">
+			<div class="col-xs-6 col-md-3 form-group">
+				<label for="inputTerms">No of Terms</label>
+				<input type="text" name="terms" id="inputTerms" class="form-control" #terms="ngModel" [(ngModel)]="loanDetail.emiDetails.term" (ngModelChange)="calcualteEMIAmount()" placeholder="Investment Amount" ngModel required pattern="[0-9]*$">
+				<field-error [control]="terms" customerror="Numbers Only !! Please check"></field-error>
+		    </div>
+		    <div class="col-xs-6 col-md-3 form-group">
+				<label for="inputEMIAmount">EMI Amount</label>
+				<input type="text" name="emiAmount" id="inputEMIAmount" class="form-control" #emiAmount="ngModel" [(ngModel)]="loanDetail.emiDetails.amount" placeholder="Investment Amount" ngModel required pattern="[0-9]*$">
+				<field-error [control]="emiAmount" customerror="Numbers Only !! Please check"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label>EMI Paid On</label>
+		      	<div class="input-group">
+		      		<input type="text" name="emidate" class="form-control col-4" [(ngModel)]="loanDetail.emiDetails.eventOn.date" pattern="[0-9]{2,2}$" ngModel #emidate="ngModel" placeholder="Date">
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="emimonth" class="form-control col-4" [(ngModel)]="loanDetail.emiDetails.eventOn.month" pattern="[0-9]{2,2}$" ngModel #emimonth="ngModel" placeholder="Month">
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="emiyear" class="form-control col-4" [(ngModel)]="loanDetail.emiDetails.eventOn.year" pattern="[0-9]{4,4}$" ngModel #emiyear="ngModel" placeholder="Year" required>
+				</div>
+				<field-error [control]="emidate" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+				<field-error [control]="emimonth" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+				<field-error [control]="emiyear" customerror="Invalid Year - Numbers only"></field-error>
+			</div>
+		</div>
+		<div class="row">
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label for="inputRemindBefore">Remind Before(In Days)</label>
+		      	<input type="text" name="remindBefore" id="inputRemindBefore" class="form-control" #remindbefore="ngModel" [(ngModel)]="loanDetail.emiDetails.remindBefore" placeholder="In Days" ngModel required pattern="[0-9]*">
+		      	<field-error [control]="remindbefore" customerror="Only Numbers!!!"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+		    	<label for="inputUser">User To Remind</label>
+		      	<select class="custom-select" id="inputUser" name="usertoremind" [(ngModel)]="loanDetail.emiDetails.userToRemind">
+			    	<option *ngFor="let user of adminUser" [ngValue]="user">{{user}}</option>
+				</select>
+		    </div>
+		</div>
+		<div class="row">
+			<div class="col-xs-12 col-md-6 form-group">
+				<label for="inputRemarks">Is Interest Only Loan ?</label>
+				<div class="form-check interest-check">
+				  <input class="form-check-input" type="radio" name="interstOnly" [(ngModel)]="loanDetail.emiDetails.isInterestOnly" id="interestOnlyNo" value="NO" checked>
+				  <label class="form-check-label" for="interestOnlyNo">
+				    NO
+				  </label>
+				</div>
+				<div class="form-check interest-check">
+				  <input class="form-check-input" type="radio" name="interstOnly" [(ngModel)]="loanDetail.emiDetails.isInterestOnly" id="interestOnlyYes" value="YES">
+				  <label class="form-check-label" for="interestOnlyYes">
+				    YES
+				  </label>
+				</div>
+		    </div>
+		</div>
+	</div>
+
+
+	<hr>
+	<div class="row">
+		<div class="col-xs-12 col-md-12 form-group">
+			<label for="inputRemarks">Remarks(Optional)</label>
+			<input type="text" name="remarks" id="inputRemarks" class="form-control" [(ngModel)]="newInvestmentData.remarks">
+	    </div>
+	</div>
+
+    <button class="btn btn-lg btn-success btn-block investment-btn" [disabled]="investmentForm.invalid || callInProgress" type="submit"><i class='fa fa-spinner fa-spin' *ngIf="callInProgress"></i>{{callInProgress ? ' Adding Investment' : 'Add Investment'}}</button>
+  </form>
+</div>

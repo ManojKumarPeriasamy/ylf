@@ -1,19 +1,27 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { ApiService } from './api.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class ProfileService {
   private token: string;
-  private userData: any;
-  constructor(private api: ApiService, private router: Router) {}
+  private preferencePage: string;
+  private userData = new BehaviorSubject({});
+  public userDataCast = this.userData.asObservable();
+
+  setInitialDataOnRefresh() {
+    this.userData.next(this.getUserDetails());
+  }
+  
+  constructor(private router: Router) {
+    this.setInitialDataOnRefresh();
+  }
 
   private saveToken(token): void {
     localStorage.setItem('yljwt', token);
     this.token = token;
   }
-  
+
   private getToken(): string {
     return localStorage.getItem('yljwt');
   }
@@ -24,45 +32,24 @@ export class ProfileService {
     if (token) {
       payload = token.split('.')[1];
       payload = window.atob(payload);
+      this.preferencePage = JSON.parse(payload).preferencePage;
       return JSON.parse(payload);
     } else {
-      return null;
+      return {};
     }
   }
 
-  public signin(credential) {
-	  this.api.signin(credential, (data) => {
+  onSignIn(data) {
 	  	this.saveToken(data.token);
-	  	this.userData = this.getUserDetails();
-	  	this.router.navigateByUrl('/' + this.userData.preferenceFirstLoad);
-	  });
+	  	this.userData.next(this.getUserDetails());
+	  	this.router.navigateByUrl('/' + this.preferencePage);
   }
   
   public logout() {
     this.token = '';
-    this.userData = {};
+    this.userData.next({});
     window.localStorage.removeItem('yljwt');
-    this.router.navigateByUrl('/');
-  }
-
-  public isLoggedIn() {
-  	return this.token ? true : false;
-  }
-
-  public getUsername() {
-  	return this.userData.username;
-  }
-
-  public isAdmin() {
-  	return this.userData.role == 'admin' ? true : false;
-  }
-
-  public isManager() {
-  	return this.userData.role == 'manager' ? true : false;
-  }
-
-  public isMember() {
-  	return this.userData.role == 'member' ? true : false;
+    this.router.navigateByUrl('/login');
   }
 
 }
