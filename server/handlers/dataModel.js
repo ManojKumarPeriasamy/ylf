@@ -95,39 +95,44 @@ module.exports = {
 
 		cb(null, transactionData);
 	},
-	milkDataModel: function(data) {
-		var milkData = {
-			entryType: "milk",
-			type: "<incoming/outgoing>",
-			name: "",
-			eventOn: {
-				date:"",
-				month:"",
-				year:"",
-				day: "",
-				session: "<Morning/Evening>"
-			},
-			noOfLitres: 0,
-			pricePerLitre: 20,
-			totalAmount: 0,
-			fatContent: "",
-			remarks: ""
+	productDataModel: function(data, cb) {
+		var productData = {
+			product: data.product,
+			remarks: data.remarks
 		}
-		return milkData;
+		var errCount = 0, dateErrorCount = 0;
+
+		util.validateString(data.name) ? productData.name = data.name : errCount++;
+		util.validateDate(data.eventOn) ? productData.eventOn = data.eventOn : dateErrorCount++;
+
+		if(productData.product === 'Milk') {
+			productData.entryType = data.entryType;
+			util.validateDefaultNumber(data.litres) ? productData.litres = data.litres : errCount++;
+			util.validateDefaultNumber(data.pricePerLitre) ? productData.pricePerLitre = data.pricePerLitre : errCount++;
+			util.validateDefaultNumber(data.amount) ? productData.amount = data.amount : errCount++;
+			util.validateDefaultNumber(data.fatContent) ? productData.fatContent = data.fatContent : errCount++;
+		} else if (productData.product === 'Tractor') {
+
+		}
+		
+		
+		if(errCount) {
+			cb("Invalid Data !!! Kindly check the info");
+			return;
+		} else if(dateErrorCount) {
+			cb("Date entered seems to be invalid !!! Kindly check");
+			return;
+		}
+
+		cb(null, productData);
 	},
 	tractorDataModel: function(data) {
 		var tractorData = {
-			entryType: "tractor",
+			product: "tractor",
 			type: "<incoming/outgoing>",
 			name: "",
 			phoneNumber: "",
-			address: {
-				streetName: "",
-				place: "",
-				city: "",
-				state: "",
-				zip: ""
-			},
+			address: "",
 			jobUnits: "",
 			costPerUnit: "",
 			noOfRolls: "",

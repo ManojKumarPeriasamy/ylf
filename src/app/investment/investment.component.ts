@@ -72,7 +72,6 @@ export class InvestmentComponent implements OnInit {
   calcualteEMIAmount() {
   	var repayAmount = this.investmentForm.form.controls.repayAmount;
   	var terms = this.investmentForm.form.controls.terms;
-  	console.log(this.investmentForm.form.controls);
   	if(repayAmount.pristine || repayAmount.errors || terms.pristine || terms.errors) {
   		return;
   	} else {

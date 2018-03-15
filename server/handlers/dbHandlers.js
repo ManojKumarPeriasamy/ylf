@@ -45,6 +45,17 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
         })
     };
 
+    dbHook.addProduct = function(productData, cb) {
+        console.log("DbHandler :: Inside product entry User")
+        db.collection('dataentry').insertOne(productData, function(err, res) {
+            if(err) {
+                cb(err);
+                return;
+            }
+            cb(null, res);
+        })
+    };
+
     dbHook.updateUser = function(query, updateInfo, cb) {
 
     };

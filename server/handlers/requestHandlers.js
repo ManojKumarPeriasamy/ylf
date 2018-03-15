@@ -80,7 +80,7 @@ module.exports = {
 	},
 
 	addTransaction: function(req, res) {
-		console.log("ReqHan :: Inside Transaction call");
+		console.log("ReqHan :: Inside Add Transaction call");
 		dataModel.transactionDataModel(req.body.transactionData, function(modelErr, transactionData) {
 			if(modelErr) {
 				res.json(dataModel.errorResponse(modelErr));
@@ -88,6 +88,25 @@ module.exports = {
 			}
 
 			dbHandlers.addTransaction(transactionData, function(dberr, response) {
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
+
+				res.json(dataModel.successResponse(response));
+			});
+		})
+	},
+
+	addProduct: function(req, res) {
+		console.log("ReqHan :: Inside Add product entry call");
+		dataModel.productDataModel(req.body.productEntry, function(modelErr, productEntry) {
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
+
+			dbHandlers.addProduct(productEntry, function(dberr, response) {
 				if(dberr) {
 					res.json(dataModel.errorResponse(dberr));
 					return;

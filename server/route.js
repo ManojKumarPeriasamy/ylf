@@ -13,8 +13,9 @@ console.log("App started initializing Routes");
 routes.post("/createUser", passport.authenticate('jwt', { session: false}), requestHandlers.addUser); // passport.authenticate('jwt', { session: false}),
 routes.post("/signin", requestHandlers.signin);
 routes.post("/addInvestment", passport.authenticate('jwt', { session: false}), requestHandlers.addInvestment);
-routes.post("/addIncome", /*passport.authenticate('jwt', { session: false}),*/ requestHandlers.addTransaction);
-routes.post("/addExpense", /*passport.authenticate('jwt', { session: false}),*/ requestHandlers.addTransaction);
+routes.post("/addIncome", passport.authenticate('jwt', { session: false}), requestHandlers.addTransaction);
+routes.post("/addExpense", passport.authenticate('jwt', { session: false}), requestHandlers.addTransaction);
+routes.post("/addProduct", /*passport.authenticate('jwt', { session: false}),*/ requestHandlers.addProduct);
 
 console.log("App Finished registering Routes");
 

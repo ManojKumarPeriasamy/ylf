@@ -125,5 +125,28 @@ export class ApiService {
     )
   }
 
+  /** Create Product API **/
+  addProduct(reqData, callback) {
+    this.httpClient.post('/api/json/addProduct', reqData, { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        if(res && res.success) {
+          callback(null, res.data);
+          this.alert.removeAlert();
+          this.alert.setAlert("SUCCESS", "Product Data Added Successfully !!!");
+          return;
+        } else {
+          this.alert.setAlert("ERROR", "ERROR - " + res.reason);
+          callback(true);
+          return;
+        }
+      }, (error: any) => {
+        this.alert.setAlert("ERROR", "Something went wrong, Please try after some time.");
+        callback(true);
+        return;
+      }
+    )
+  }
+
 
 }
