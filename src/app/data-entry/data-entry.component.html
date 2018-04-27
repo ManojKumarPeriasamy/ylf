@@ -1,5 +1,5 @@
 <div class="product-container">
-  <form #productDataForm="ngForm" (ngSubmit)="addProductData()" class="form-create-user">
+  <form #productDataForm="ngForm" (ngSubmit)="addProductData()">
     <div class="text-center mb-4">
       <i class="fa fa-truck fa-fw product-icon"></i>
     </div>
@@ -24,8 +24,16 @@
 	    </div>
 	    <div class="col-xs-6 col-md-3 form-group">
 	        <label for="name">Name</label>
-	      	<input type="text" name="name" id="name" class="form-control" #name="ngModel" [(ngModel)]="newProductData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
-	      	<field-error [control]="name" customerror="Only characters, space and - allowed"></field-error>
+	      	<input type="text" name="name" id="name" class="form-control" #name="ngModel" [(ngModel)]="newProductData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*" [typeahead]="customerNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
+		    <div class="ylf-field-error" *ngIf="noResultTypeAhead">
+		  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
+		  		<span>No Results Found</span>
+		    </div>
+	    	<div class="clearfix">
+		      	<div class="pull-right add-customer-link" (click)="openAddCustomerModal()" tabindex="0">
+			  		<span>+ Add Customer</span>
+		    	</div>
+		    </div>
 	    </div>
 	    <div class="col-xs-6 col-md-3 form-group" *ngIf="newProductData.product === 'Milk'">
 	        <label for="time">Time</label>
@@ -35,8 +43,25 @@
 		</div>
 		<div class="col-xs-6 col-md-3 form-group" *ngIf="newProductData.product === 'Tractor'">
 	        <label for="phone">Phone</label>
-	      	<input type="text" name="phone" id="phone" class="form-control" #phone="ngModel" [(ngModel)]="newProductData.name" placeholder="Phone #" ngModel required pattern="[0-9]{10,10}">
-	      	<field-error [control]="phone" customerror="Only Numbers!!!"></field-error>
+	      	<input type="text" name="phone" id="phone" class="form-control" #phone="ngModel" [(ngModel)]="newProductData.phone" placeholder="Phone #" ngModel required pattern="[0-9]{10,10}">
+	      	<field-error [control]="phone" customerror="Only Numbers - 10 digits!!"></field-error>
+	    </div>
+	</div>
+	<div class="row" *ngIf="newProductData.product === 'Tractor'">
+		<div class="col-xs-6 col-md-3 form-group">
+	        <label for="startingunit">Starting Unit</label>
+	      	<input type="text" name="startingunit" id="startingunit" class="form-control" #startingunit="ngModel" [(ngModel)]="newProductData.startingUnit" (ngModelChange)="calculateUnit()" placeholder="Unit" ngModel required pattern="[0-9]*">
+	      	<field-error [control]="startingunit" customerror="Numbers Only!!"></field-error>
+	    </div>
+	    <div class="col-xs-6 col-md-3 form-group">
+	        <label for="endingunit">Ending Unit</label>
+	      	<input type="text" name="endingunit" id="endingunit" class="form-control" #endingunit="ngModel" [(ngModel)]="newProductData.endingUnit" (ngModelChange)="calculateUnit()" placeholder="Unit" ngModel required pattern="[0-9]*">
+	      	<field-error [control]="endingunit" customerror="Numbers Only!!"></field-error>
+	    </div>
+	    <div class="col-xs-6 col-md-3 form-group">
+	        <label for="totalunits">Total Unit</label>
+	      	<input type="text" name="totalunits" [readonly]="true" id="totalunits" class="form-control" #totalunits="ngModel" [(ngModel)]="newProductData.totalUnits" placeholder="Units" ngModel required pattern="[0-9]*">
+	      	<field-error [control]="totalunits" customerror="Invalid Starting and Ending Unit!!"></field-error>
 	    </div>
 	</div>
 	<div class="row" *ngIf="newProductData.product === 'Milk'">
@@ -47,13 +72,23 @@
 	    </div>
 	    <div class="col-xs-4 col-md-2 form-group">
 	        <label for="pricePerLitre">Price/Litre</label>
-	      	<input type="text" name="pricePerLitre" id="pricePerLitre" class="form-control" #pricePerLitre="ngModel" [(ngModel)]="newProductData.pricePerLitre" (ngModelChange)="calculateAmount()" placeholder="Name" ngModel required pattern="[0-9.]*">
+	        <div class="input-group">
+	        	<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+	      		<input type="text" name="pricePerLitre" id="pricePerLitre" class="form-control" #pricePerLitre="ngModel" [(ngModel)]="newProductData.pricePerLitre" (ngModelChange)="calculateAmount()" placeholder="Name" ngModel required pattern="[0-9.]*">
+	      	</div>
 	      	<field-error [control]="pricePerLitre" customerror="Numbers with decimal point!!"></field-error>
 	    </div>
 		<div class="col-xs-4 col-md-2 form-group">
 			<label for="inputAmount">Amount</label>
-			<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newProductData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
-			<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+			<div class="input-group">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+				<input type="text" name="amount" [readonly]="true" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newProductData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
+			</div>
+			<field-error [control]="amount" customerror="Invalid Units or Price!!"></field-error>
 	    </div>
 	    <div class="col-xs-12 col-md-6 form-group">
 	        <label>Date</label>
@@ -75,30 +110,55 @@
 	</div>
 
 	<div class="row" *ngIf="newProductData.product === 'Tractor'">
-		<div class="col-xs-4 col-md-2 form-group">
-	        <label for="units">Units</label>
-	      	<input type="text" name="units" id="units" class="form-control" #units="ngModel" [(ngModel)]="newProductData.units" (ngModelChange)="calculateAmount()" placeholder="Units" ngModel required pattern="[0-9.]*">
-	      	<field-error [control]="units" customerror="Numbers with decimal point!!"></field-error>
+		<div class="col-xs-4 col-md-2 form-group" *ngIf="newProductData.jobType === 'Plough'">
+	        <label for="unitschargeable">Units Chargeable</label>
+	      	<input type="text" name="unitschargeable" id="unitschargeable" class="form-control" #unitschargeable="ngModel" [(ngModel)]="newProductData.chargeableUnits" (ngModelChange)="calculateTractorAmount()" placeholder="Units" ngModel required pattern="[0-9.]*">
+	      	<field-error [control]="units-chargeable" customerror="Numbers with decimal point!!"></field-error>
 	    </div>
-	    <div class="col-xs-4 col-md-2 form-group">
+	    <div class="col-xs-4 col-md-2 form-group" *ngIf="newProductData.jobType === 'Plough'">
 	        <label for="costPerUnit">Cost/Unit</label>
-	      	<input type="text" name="costPerUnit" id="costPerUnit" class="form-control" #costPerUnit="ngModel" [(ngModel)]="newProductData.costPerUnit" (ngModelChange)="calculateAmount()" placeholder="cost per unit" ngModel required pattern="[0-9]*">
+	        <div class="input-group">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+	      		<input type="text" name="costPerUnit" id="costPerUnit" class="form-control" #costPerUnit="ngModel" [(ngModel)]="newProductData.costPerUnit" (ngModelChange)="calculateTractorAmount()" placeholder="cost per unit" ngModel required pattern="[0-9.]*">
+	      	</div>
 	      	<field-error [control]="costPerUnit" customerror="Numbers with decimal point!!!!"></field-error>
 	    </div>
-	    <div class="col-xs-4 col-md-2 form-group" *ngIf="newProductData.jobType === 'Grass Baler'">
+	    <div class="col-xs-6 col-md-3 form-group" *ngIf="newProductData.jobType === 'Grass Baler'">
 	        <label for="noOfRolls">No of Rolls</label>
-	      	<input type="text" name="noOfRolls" id="noOfRolls" class="form-control" #noOfRolls="ngModel" [(ngModel)]="newProductData.noOfRolls" (ngModelChange)="calculateAmount()" placeholder="No of Rolls" ngModel required pattern="[0-9.]*">
+	      	<input type="text" name="noOfRolls" id="noOfRolls" class="form-control" #noOfRolls="ngModel" [(ngModel)]="newProductData.noOfRolls" (ngModelChange)="calculateTractorAmount()" placeholder="No of Rolls" ngModel required pattern="[0-9.]*">
 	      	<field-error [control]="noOfRolls" customerror="Numbers with decimal point!!"></field-error>
 	    </div>
-	    <div class="col-xs-4 col-md-4 form-group" *ngIf="newProductData.jobType === 'Grass Baler'">
+	    <div class="col-xs-6 col-md-3 form-group" *ngIf="newProductData.jobType === 'Grass Baler'">
 	        <label for="costPerRoll">Cost/Roll</label>
-	      	<input type="text" name="costPerRoll" id="costPerRoll" class="form-control" #costPerRoll="ngModel" [(ngModel)]="newProductData.costPerRoll" (ngModelChange)="calculateAmount()" placeholder="cost per roll" ngModel required pattern="[0-9]*">
+	        <div class="input-group">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+	      		<input type="text" name="costPerRoll" id="costPerRoll" class="form-control" #costPerRoll="ngModel" [(ngModel)]="newProductData.costPerRoll" (ngModelChange)="calculateTractorAmount()" placeholder="cost per roll" ngModel required pattern="[0-9.]*">
+	      	</div>
 	      	<field-error [control]="costPerRoll" customerror="Numbers only!!"></field-error>
 	    </div>
 		<div class="col-xs-4 col-md-2 form-group">
 			<label for="inputAmount">Total Cost</label>
-			<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newProductData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
-			<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+			<div class="input-group">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+				<input type="text" name="amount" [readonly]="true"  id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newProductData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*">
+			</div>
+			<field-error [control]="amount" customerror="Invalid roll count or cost/roll!!"></field-error>
+	    </div>
+	    <div class="col-xs-8 col-md-4 form-group" *ngIf="newProductData.jobType === 'Grass Baler'">
+			<label for="driverExpense">Drivers Expense</label>
+			<div class="input-group">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+				<input type="text" name="driverExpense" id="driverExpense" class="form-control" #driverExpense="ngModel" [(ngModel)]="newProductData.driverExpense" placeholder="Driver Expense" ngModel required pattern="[0-9.]*">
+			</div>
+			<field-error [control]="driverExpense" customerror="Numbers with decimal point!!"></field-error>
 	    </div>
 	    <div class="col-xs-12 col-md-6 form-group">
 	        <label>Date</label>
@@ -117,11 +177,6 @@
 			<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
 			<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
 		</div>
-		<div class="col-xs-6 col-md-3 form-group">
-			<label for="driverExpense">Drivers Expense</label>
-			<input type="text" name="driverExpense" id="driverExpense" class="form-control" #driverExpense="ngModel" [(ngModel)]="newProductData.driverExpense" placeholder="Driver Expense" ngModel required pattern="[0-9.]*$">
-			<field-error [control]="driverExpense" customerror="Numbers with decimal point!!"></field-error>
-	    </div>
 	</div>
 
 	<div class="row" *ngIf="newProductData.product === 'Milk'">
@@ -135,8 +190,8 @@
 	<div class="row" *ngIf="newProductData.product === 'Tractor'">
 		<div class="col-xs-12 col-md-12 form-group">
 			<label for="address">Address</label>
-			<input type="text" name="address" id="address" class="form-control" #name="ngModel" [(ngModel)]="newProductData.address" placeholder="Address" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z0-9 \-,]*">
-	      	<field-error [control]="name" customerror="Only characters, space and - allowed"></field-error>
+			<input type="text" name="address" id="address" class="form-control" #address="ngModel" [(ngModel)]="newProductData.address" placeholder="Address" ngModel required minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
+	      	<field-error [control]="address" customerror="Only characters with space , and - allowed"></field-error>
 	    </div>
 	</div>
 
@@ -149,4 +204,179 @@
 
     <button class="btn btn-lg btn-success btn-block product-btn" [disabled]="productDataForm.invalid || callInProgress" type="submit"><i class='fa fa-spinner fa-spin' *ngIf="callInProgress"></i>{{callInProgress ? ' Saving' : 'Save'}}</button>
   </form>
+
+  <div class="product-table">
+  	<div class="text-center mt-4">
+      <h4>Recent Product Entries(Last 10 transactions)</h4>
+    </div>
+    <ul class="nav nav-tabs" id="productTab" role="tablist">
+	  <li class="nav-item">
+	    <a class="nav-link" [ngClass]="{'active': isMilkTab}" id="milk-tab" role="tab" (click)="toogleProductTab('Milk')" aria-controls="milkTab" aria-selected="true">Milk Data</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" [ngClass]="{'active': isTractorTab}" id="tractor-tab" role="tab" (click)="toogleProductTab('Tractor')" aria-controls="tractorTab" aria-selected="true">Tractor Data</a>
+	  </li>
+	</ul>
+	<div class="tab-content" id="myTabContent">
+		<div class="tab-pane fade" [ngClass]="{'show active': isMilkTab}" id="milkTab" role="tabpanel" aria-labelledby="milk-tab">
+		    <div>
+		      <a class="pull-right view-all-link" routerLink="/product-entry/milk/all">View All Milk Entries</a>
+		    </div>
+		    <div class="data-loader" *ngIf="isMilkDetailsLoading || milkDetails.length === 0">
+		      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isMilkDetailsLoading"></i>
+			  	<span class='fs2' *ngIf="milkDetails.length === 0">No Results found</span>
+			</div>
+		    <div class="table-responsive-md mb-4" *ngIf="!(isMilkDetailsLoading || milkDetails.length === 0)">
+		      <table class="table">
+				  <thead class="thead-light text-center">
+				    <tr>
+				      <th scope="col">Actions</th>
+				      <th scope="col">Name</th>
+				      <th scope="col">Entry Type</th>
+				      <th scope="col">Time</th>
+				      <th scope="col">Amount(₹)</th>
+				      <th scope="col">Entry Date</th> 
+				      <th scope="col">Date Created</th>
+				    </tr>
+				  </thead>
+				  <tbody class="text-center">
+				    <tr *ngFor="let data of milkDetails">
+				      <th>
+				      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/product-entry/milk/{{data.productId}}"></i>
+				      </th>
+				      <td>{{data.name}}</td>
+				      <td>{{data.entryType}}</td>
+				      <td>{{data.time}}</td>
+				      <td>{{data.amount}}</td>
+				      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+				      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
+				    </tr>
+				  </tbody>
+			  </table>
+		    </div>
+		</div>
+		<div class="tab-pane fade" [ngClass]="{'show active': isTractorTab}" id="tractorTab" role="tabpanel" aria-labelledby="tractor-tab">
+			<div>
+		      <a class="pull-right view-all-link" routerLink="/product-entry/tractor/all">View All Tractor Entries</a>
+		    </div>
+		    <div class="data-loader" *ngIf="isTractorDetailsLoading || tractorDetails.length === 0">
+		      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTractorDetailsLoading"></i>
+			  	<span class="fs2" *ngIf="tractorDetails.length === 0">No Results found</span>
+			</div>
+		    <div class="table-responsive-md mb-4" *ngIf="!(isTractorDetailsLoading || tractorDetails.length === 0)">
+		      <table class="table">
+				  <thead class="thead-light text-center">
+				    <tr>
+				      <th scope="col">Actions</th>
+				      <th scope="col">Name</th>
+				      <th scope="col">Job Type</th>
+				      <th scope="col">Amount(₹)</th>
+				      <th scope="col">Phone#</th>
+				      <th scope="col">Entry Date</th>
+				      <th scope="col">Date Created</th>
+				    </tr>
+				  </thead>
+				  <tbody class="text-center">
+				    <tr *ngFor="let data of tractorDetails">
+				      <th>
+				      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/product-entry/tractor/{{data.productId}}"></i>
+				      </th>
+				      <td>{{data.name}}</td>
+				      <td>{{data.jobType}}</td>
+				      <td>{{data.amount}}</td>
+				      <td>{{data.phone}}</td>
+				      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+				      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
+				    </tr>
+				  </tbody>
+			  </table>
+		    </div>
+		</div>
+	</div>
+  </div>
+
+    <div class="backdrop" [ngClass]="{'show-backdrop': isModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isModalActive}" tabindex="-1" role="dialog" aria-labelledby="addCustomerLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <form #customerDataForm="ngForm">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="addCustomerLabel">{{isAddCustomerSuccess ? 'Confirmation' : 'Add Customer'}}</h5>
+		        <button *ngIf="!isAddCustomerInProgress" type="button" class="close" aria-label="Close">
+		          <span aria-hidden="true" (click)="closeModal()">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      	<div *ngIf="customerModalError" class="mt15">
+					<div class="alert alert-danger" role="alert">
+					  {{customerModalError}}
+					</div>
+				</div>
+				<div class="mt15">
+		        {{isAddCustomerSuccess ? 'Successfully Created a Customer!!' : 'Please provide below details to create a new Customer'}} </div>
+		        <div *ngIf="!isAddCustomerSuccess">
+			        <div class="row mt30">
+			        	<div class="col-6 form-group">
+				        	<label for="customername">Customer Name</label>
+				        	<input type="text" name="customername" id="customername" class="form-control" #customername="ngModel" [(ngModel)]="newCustomerData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
+				        	<field-error [control]="customername" customerror="Please enter Valid Name"></field-error>
+				        </div>
+			        </div>
+			        <h5 class="mt15">Optional</h5>
+			        <hr/>
+			        <div class="row">
+			        	<div class="col-12 form-group">
+				        	<label for="phoneCustomer">Phone</label>
+					      	<input type="text" name="phoneCustomer" id="phoneCustomer" class="form-control" #phoneCustomer="ngModel" [(ngModel)]="newCustomerData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
+					      	<field-error [control]="phoneCustomer" customerror="Only Numbers - 10 digits!!"></field-error>
+					    </div>
+			        	<div class="col-12 form-group">
+				        	<label for="addressCustomer">Address</label>
+							<input type="text" name="addressCustomer" id="addressCustomer" class="form-control" #addressCustomer="ngModel" [(ngModel)]="newCustomerData.address" placeholder="Address" ngModel minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
+					      	<field-error [control]="addressCustomer" customerror="Only characters with space , and - allowed"></field-error>
+					    </div>
+			        </div>
+			        <div class="row">
+			        	<div class="col-4 form-group">
+			        		<label for="pricePerLitreCustomer">Price/Litre</label>
+					        <div class="input-group">
+					        	<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="pricePerLitreCustomer" id="pricePerLitreCustomer" class="form-control" #pricePerLitreCustomer="ngModel" [(ngModel)]="newCustomerData.pricePerLitre" placeholder="Name" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="pricePerLitreCustomer" customerror="Numbers with decimal point!!"></field-error>
+			        	</div>
+			        	<div class="col-4 form-group">
+				        	<label for="costPerUnitCustomer">Cost/Unit</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerUnitCustomer" id="costPerUnitCustomer" class="form-control" #costPerUnitCustomer="ngModel" [(ngModel)]="newCustomerData.costPerUnit" placeholder="cost per unit" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerUnitCustomer" customerror="Numbers with decimal point!!!!"></field-error>
+				        </div>
+				        <div class="col-4 form-group">
+					        <label for="costPerRollCustomer">Cost/Roll</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerRollCustomer" id="costPerRollCustomer" class="form-control" #costPerRollCustomer="ngModel" [(ngModel)]="newCustomerData.costPerRoll" placeholder="cost per roll" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerRollCustomer" customerror="Numbers only!!"></field-error>
+					    </div>
+			        </div>
+			    </div>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-success" [disabled]="isAddCustomerInProgress" (click)="closeModal()">{{isAddCustomerSuccess ? 'Ok' : 'Close'}}</button>
+		        <button type="button" [disabled]="isAddCustomerInProgress || customerDataForm.invalid" *ngIf="!isAddCustomerSuccess" class="btn btn-success" (click)="addCustomer()"><i class='fa fa-spinner fa-spin' *ngIf="isAddCustomerInProgress"></i>{{isAddCustomerInProgress ? ' Adding...' : 'Add Customer'}}</button>
+		      </div>
+		  </form>
+	    </div>
+	  </div>
+	</div>
 </div>

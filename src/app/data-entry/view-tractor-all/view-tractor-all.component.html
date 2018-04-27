@@ -1,0 +1,38 @@
+<div class="view-all-tractor-container">
+	<h1>
+		List of Tractor Entries
+	</h1>
+	<hr/>
+	<div class="data-loader" *ngIf="isTractorDetailsLoading || tractorDetails.length === 0">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTractorDetailsLoading"></i>
+	  	<span class="fs2" *ngIf="tractorDetails.length === 0">No Results found</span>
+	</div>
+    <div class="table-responsive-md mb-4" *ngIf="!(isTractorDetailsLoading || tractorDetails.length === 0)">
+      <table class="table">
+		  <thead class="thead-light text-center">
+		    <tr>
+		      <th scope="col">Actions</th>
+		      <th scope="col">Name</th>
+		      <th scope="col">Job Type</th>
+		      <th scope="col">Amount(₹)</th>
+		      <th scope="col">Phone#</th>
+		      <th scope="col">Entry Date</th>
+		      <th scope="col">Date Created</th>
+		    </tr>
+		  </thead>
+		  <tbody class="text-center">
+		    <tr *ngFor="let data of tractorDetails">
+		      <th>
+		      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/product-entry/tractor/{{data.productId}}"></i>
+		      </th>
+		      <td>{{data.name}}</td>
+		      <td>{{data.jobType}}</td>
+		      <td>{{data.amount}}</td>
+		      <td>{{data.phone}}</td>
+		      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+		      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
+		    </tr>
+		  </tbody>
+	  </table>
+    </div>
+</div>

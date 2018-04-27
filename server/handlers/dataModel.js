@@ -35,7 +35,7 @@ module.exports = {
 	investmentDataModel: function(data, cb) {
 		var investmentData = {
 			majorType: "Investment",
-			remarks: data.remarks.toString()
+			remarks: data.remarks ? data.remarks.toString() : ''
 		}
 		var errCount = 0, dateErrorCount = 0;
 
@@ -75,16 +75,27 @@ module.exports = {
 	transactionDataModel: function(data, cb) {
 		var transactionData = {
 			majorType: data.transactionType,
-			remarks: data.remarks
+			remarks: data.remarks ? data.remarks.toString() : ''
 		}
 		var errCount = 0, dateErrorCount = 0;
 
-		transactionData.type = (data.transactionType === 'Income' ? data.incomeType : data.expenseType);
+		if(data.transactionType === 'Income') {
+			transactionData.type = data.incomeType;
+			transactionData.category = data.incomeCategory;
+		} else {
+			transactionData.type = data.expenseType;
+			transactionData.category = data.expenseCategory;
+			util.validateDefaultNumber(data.totalExpense) ? transactionData.totalExpense = data.totalExpense : errCount++;
+			transactionData.billNo = data.billNo;
+			transactionData.billAttachmnet = data.billAttachment;
+		}
 
 		util.validateDefaultNumber(data.amount) ? transactionData.amount = data.amount : errCount++;
+		
 		util.validateString(data.name) ? transactionData.name = data.name : errCount++;
 		util.validateDate(data.eventOn) ? transactionData.eventOn = data.eventOn : dateErrorCount++;
-		
+		transactionData.dateCreated = util.getCurrentDate();
+
 		if(errCount) {
 			cb("Invalid Data !!! Kindly check the info");
 			return;
@@ -98,7 +109,7 @@ module.exports = {
 	productDataModel: function(data, cb) {
 		var productData = {
 			product: data.product,
-			remarks: data.remarks
+			remarks: data.remarks ? data.remarks.toString() : ''
 		}
 		var errCount = 0, dateErrorCount = 0;
 
@@ -107,14 +118,29 @@ module.exports = {
 
 		if(productData.product === 'Milk') {
 			productData.entryType = data.entryType;
+			productData.time = data.time;
 			util.validateDefaultNumber(data.litres) ? productData.litres = data.litres : errCount++;
 			util.validateDefaultNumber(data.pricePerLitre) ? productData.pricePerLitre = data.pricePerLitre : errCount++;
 			util.validateDefaultNumber(data.amount) ? productData.amount = data.amount : errCount++;
 			util.validateDefaultNumber(data.fatContent) ? productData.fatContent = data.fatContent : errCount++;
 		} else if (productData.product === 'Tractor') {
-
+			productData.jobType = data.jobType;
+			productData.address = data.address;
+			util.validateDefaultNumber(data.startingUnit) ? productData.startingUnit = data.startingUnit : errCount++;
+			util.validateDefaultNumber(data.endingUnit) ? productData.endingUnit = data.endingUnit : errCount++;
+			util.validateDefaultNumber(data.totalUnits) ? productData.totalUnits = data.totalUnits : errCount++;
+			util.validatePhoneNumber(data.phone) ? productData.phone = data.phone : errCount++;
+			if(productData.jobType == 'Plough') {
+				util.validateDefaultNumber(data.chargeableUnits) ? productData.chargeableUnits = data.chargeableUnits : errCount++;
+				util.validateDefaultNumber(data.costPerUnit) ? productData.costPerUnit = data.costPerUnit : errCount++;
+			} else if (productData.jobType == 'Grass Baler') {
+				util.validateDefaultNumber(data.noOfRolls) ? productData.noOfRolls = data.noOfRolls : errCount++;
+				util.validateDefaultNumber(data.costPerRoll) ? productData.costPerRoll = data.costPerRoll : errCount++;
+				util.validateDefaultNumber(data.driverExpense) ? productData.driverExpense = data.driverExpense : errCount++;
+			}
+			util.validateDefaultNumber(data.amount) ? productData.amount = data.amount : errCount++;
 		}
-		
+		productData.dateCreated = util.getCurrentDate();
 		
 		if(errCount) {
 			cb("Invalid Data !!! Kindly check the info");
@@ -126,21 +152,100 @@ module.exports = {
 
 		cb(null, productData);
 	},
-	tractorDataModel: function(data) {
-		var tractorData = {
-			product: "tractor",
-			type: "<incoming/outgoing>",
-			name: "",
-			phoneNumber: "",
-			address: "",
-			jobUnits: "",
-			costPerUnit: "",
-			noOfRolls: "",
-			costPerRoll: "",
-			totalCost: "",
-			driverExpense: ""
+	verifyUpdateMilkData: function(data, cb) {
+		var errCount = 0, dateErrorCount = 0;
+
+		var editMilkData = {
+			remarks: data.remarks ? data.remarks.toString() : ''
 		}
-		return tractorData;
+
+		util.validateDefaultNumber(data.litres) ? editMilkData.litres = data.litres : errCount++;
+		util.validateDefaultNumber(data.pricePerLitre) ? editMilkData.pricePerLitre = data.pricePerLitre : errCount++;
+		util.validateDefaultNumber(data.amount) ? editMilkData.amount = data.amount : errCount++;
+		util.validateDefaultNumber(data.fatContent) ? editMilkData.fatContent = data.fatContent : errCount++;
+		util.validateDate(data.eventOn) ? editMilkData.eventOn = data.eventOn : dateErrorCount++;
+
+		editMilkData.updatedOn = util.getCurrentDate();
+
+		if(errCount) {
+			cb("Invalid Data !!! Kindly check the info");
+			return;
+		} else if(dateErrorCount) {
+			cb("Date entered seems to be invalid !!! Kindly check");
+			return;
+		} 
+		cb(null, editMilkData);
+	},
+	verifyUpdateTractorData: function(data, cb) {
+		var errCount = 0, dateErrorCount = 0;
+
+		var editTractorData = {
+			address: data.address,
+			remarks: data.remarks ? data.remarks.toString() : ''
+		}
+
+		util.validateDefaultNumber(data.startingUnit) ? editTractorData.startingUnit = data.startingUnit : errCount++;
+		util.validateDefaultNumber(data.endingUnit) ? editTractorData.endingUnit = data.endingUnit : errCount++;
+		util.validateDefaultNumber(data.totalUnits) ? editTractorData.totalUnits = data.totalUnits : errCount++;
+		util.validateDate(data.eventOn) ? editTractorData.eventOn = data.eventOn : dateErrorCount++;
+
+		if(data.jobType == 'Plough') {
+			util.validateDefaultNumber(data.chargeableUnits) ? editTractorData.chargeableUnits = data.chargeableUnits : errCount++;
+			util.validateDefaultNumber(data.costPerUnit) ? editTractorData.costPerUnit = data.costPerUnit : errCount++;
+		} else if (data.jobType == 'Grass Baler') {
+			util.validateDefaultNumber(data.noOfRolls) ? editTractorData.noOfRolls = data.noOfRolls : errCount++;
+			util.validateDefaultNumber(data.costPerRoll) ? editTractorData.costPerRoll = data.costPerRoll : errCount++;
+			util.validateDefaultNumber(data.driverExpense) ? editTractorData.driverExpense = data.driverExpense : errCount++;
+		}
+		util.validateDefaultNumber(data.amount) ? editTractorData.amount = data.amount : errCount++;
+		editTractorData.updatedOn = util.getCurrentDate();
+
+		if(errCount) {
+			cb("Invalid Data !!! Kindly check the info");
+			return;
+		} else if(dateErrorCount) {
+			cb("Date entered seems to be invalid !!! Kindly check");
+			return;
+		} 
+		cb(null, editTractorData);
+	},
+	customerDataModel: function(data, cb) {
+		var customerData = {
+			address: data.address || '', 
+			pricePerLitre: data.pricePerLitre,
+			costPerUnit: data.costPerUnit,
+			costPerRoll: data.costPerRoll,
+			phone: data.phone,
+			dateCreated: util.getCurrentDate(),
+			productInvoice: 1,
+			transactionInvoice: 1
+		};
+		var errCount = 0;
+
+		util.validateString(data.name) ? customerData.name = data.name : errCount++;
+
+		if(errCount) {
+			cb("Invalid Data !!! Please enter a valid name");
+			return;
+		}
+
+		cb(null, customerData);
+	},
+	investorDataModel: function(data, cb) {
+		var investorData = {
+			dateCreated: util.getCurrentDate(),
+			investmentInvoice: 1
+		};
+		var errCount = 0;
+
+		util.validateString(data.name) ? investorData.name = data.name : errCount++;
+
+		if(errCount) {
+			cb("Invalid Data !!! Please enter a valid name");
+			return;
+		}
+
+		cb(null, investorData);
 	},
 	errorResponse: function(error) {
 		console.log("Data Model :: Error on request -- " + error);

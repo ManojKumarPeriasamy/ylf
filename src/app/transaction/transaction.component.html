@@ -6,34 +6,71 @@
       <i class="fa fa-arrow-right fa-fw transaction-icon"></i>
     </div>
     <div class="row">
-	    <div class="col-xs-12 col-md-6 form-group">
-	        <label for="inputType">Transaction Type</label>
-	      	<select class="custom-select" id="inputType" name="type" [(ngModel)]="newTransactionData.transactionType" (ngModelChange)="typeChanged()">
+	    <div class="col-xs-4 col-md-2 form-group">
+	        <label for="inputType">Type</label>
+	      	<select class="custom-select" id="inputType" name="type" [(ngModel)]="newTransactionData.transactionType">
 			    <option *ngFor="let type of transactionTypes" value="{{type}}">{{type}}</option>
+			</select>
+	    </div>
+
+	    <div class="col-xs-8 col-md-4 form-group" *ngIf="newTransactionData.transactionType === 'Income'">
+	        <label for="inputIncomeCategory">Income Category</label>
+	      	<select class="custom-select" id="inputIncomeCategory" name="incomecategory" [(ngModel)]="selectedIncomeCategory" (ngModelChange)="categoryChanged()">
+			    <option *ngFor="let category of incomeCategories" [ngValue]="category">{{category.name}}</option>
 			</select>
 	    </div>
 	    <div class="col-xs-12 col-md-6 form-group" *ngIf="newTransactionData.transactionType === 'Income'">
 	        <label for="inputIncomeType">Income Type</label>
 	      	<select class="custom-select" id="inputIncomeType" name="incometype" [(ngModel)]="newTransactionData.incomeType">
-			    <option *ngFor="let type of incomeTypes" value="{{type}}">{{type}}</option>
+			    <option *ngFor="let type of selectedIncomeCategory.types" value="{{type}}">{{type}}</option>
+			</select>
+	    </div>
+
+	    <div class="col-xs-8 col-md-4 form-group" *ngIf="newTransactionData.transactionType !== 'Income'">
+	        <label for="inputExpenseCategory">Expense Category</label>
+	      	<select class="custom-select" id="inputExpenseCategory" name="expensecategory" [(ngModel)]="selectedExpenseCategory" (ngModelChange)="categoryChanged()">
+			    <option *ngFor="let category of expenseCategories" [ngValue]="category">{{category.name}}</option>
 			</select>
 	    </div>
 	    <div class="col-xs-12 col-md-6 form-group" *ngIf="newTransactionData.transactionType !== 'Income'">
 	        <label for="inputExpenseType">Expense Type</label>
 	      	<select class="custom-select" id="inputExpenseType" name="expensetype" [(ngModel)]="newTransactionData.expenseType">
-			    <option *ngFor="let type of expenseTypes" value="{{type}}">{{type}}</option>
+			    <option *ngFor="let type of selectedExpenseCategory.types" value="{{type}}">{{type}}</option>
 			</select>
 	    </div>
 	</div>
 	<div class="row">
 		<div class="col-xs-12 col-md-6 form-group">
 	        <label for="inputSource">{{newTransactionData.transactionType === 'Income' ? 'Income From' : 'Paid To'}}</label>
-	      	<input type="text" name="sourceName" id="inputSource" class="form-control" #name="ngModel" [(ngModel)]="newTransactionData.name" placeholder="Transaction Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*">
-	      	<field-error [control]="name" customerror="Only characters, space and - allowed"></field-error>
+	      	<input type="text" name="sourceName" id="inputSource" class="form-control" #name="ngModel" [(ngModel)]="newTransactionData.name" placeholder="Transaction Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="customerNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
+	      	<div class="ylf-field-error" *ngIf="noResultTypeAhead">
+		  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
+		  		<span>No Results Found</span>
+		    </div>
+		    <div class="clearfix">
+		      	<div class="pull-right add-customer-link" (click)="openAddCustomerModal()" tabindex="0">
+			  		<span>+ Add Customer</span>
+		    	</div>
+		    </div>
 	    </div>
-		<div class="col-xs-12 col-md-6 form-group">
-			<label for="inputAmount">Transaction Amount</label>
-			<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newTransactionData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9]*$">
+	    <div class="col-xs-6 col-md-3 form-group" *ngIf="newTransactionData.transactionType !== 'Income'">
+	        <label for="inputExpenseTotal">Total Expense</label>
+	        <div class="input-group">
+	        	<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+	      		<input type="text" name="inputExpenseTotal" id="inputExpenseTotal" class="form-control" #totalExpense="ngModel" [(ngModel)]="newTransactionData.totalExpense" placeholder="Total Amount" ngModel required pattern="[0-9]*$">
+	      	</div>
+			<field-error [control]="totalExpense" customerror="Numbers Only !! Please check"></field-error>
+	    </div>
+		<div class=" form-group" [ngClass]="newTransactionData.transactionType === 'Income' ? 'col-xs-12 col-md-6' : 'col-xs-6 col-md-3'">
+			<label for="inputAmount">{{newTransactionData.transactionType === 'Income' ? 'Income Amount' : 'Expense Paid'}}</label>
+			<div class="input-group">
+	        	<div class="input-group-prepend">
+			    	<span class="input-group-text">₹</span>
+			  	</div>
+				<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newTransactionData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9]*$">
+			</div>
 			<field-error [control]="amount" customerror="Numbers Only !! Please check"></field-error>
 	    </div>
 	</div>
@@ -58,6 +95,46 @@
 		</div>
 	</div>
 
+	<div class="row" *ngIf="newTransactionData.transactionType !== 'Income'">
+		<div class="col-xs-12 col-md-6 form-group">
+	        <label for="billNo">Bill Number</label>
+	      	<input type="text" name="billNo" id="billNo" class="form-control" #billNo="ngModel" [(ngModel)]="newTransactionData.billNo" placeholder="Bill No #" ngModel required pattern="[0-9]*$">
+			<field-error [control]="billNo" customerror="Numbers Only !! Please check"></field-error>
+	    </div>
+	    <div class="col-xs-12 col-md-6 form-group">
+	    	<label>Upload Bill</label>
+			<div class="custom-file">
+			    <input type="file" #fileInput class="custom-file-input" (change)="validateFile()" id="inputBill">
+			    <label class="custom-file-label" for="inputBill">{{selectedFileName}}</label>
+			</div>
+			<div class="ylf-field-error" *ngIf="uploadError">
+		  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
+		  		<span>{{uploadError}}</span>
+		    </div>
+
+		    <div *ngIf="newTransactionData.billAttachment.length > 0">
+				<div class="row bill-item mt15" *ngFor="let attachment of newTransactionData.billAttachment">
+					<div class="col-6">{{attachment.filename}}</div>
+					<div class="col-4">{{calculateFileSize(attachment.size)}} KB</div>
+					<div class="col-1 text-right bill-view-icon" (click)="openBillModal('view', attachment.filename)" tabindex="0">
+			    		<i class="fa fa-eye fa-fw"></i>
+			    	</div>
+					<div class="col-1 text-right bill-delete-icon" (click)="openBillModal('delete', attachment.filename)" tabindex="0">
+			    		<i class='fa fa-trash'></i>
+			    	</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="clearfix" *ngIf="newTransactionData.transactionType !== 'Income'">
+		<div class="pull-right">
+			<button type="button" [disabled]="!isFileSelected" class="btn btn-small btn-success" (click)="upload()"><i class='fa fa-spinner fa-spin' *ngIf="isFileUploading"></i>{{isFileUploading ? ' Uploading' : 'Upload'}}</button>
+		</div>
+	</div>
+
+
+
 	<div class="row">
 		<div class="col-xs-12 col-md-12">
 			<label for="inputRemarks">Remarks(Optional)</label>
@@ -67,4 +144,121 @@
 
     <button class="btn btn-lg btn-success btn-block transaction-btn" [disabled]="transactionForm.invalid || callInProgress" type="submit"><i class='fa fa-spinner fa-spin' *ngIf="callInProgress"></i>{{callInProgress ? ' Adding Transaction' : 'Add Transaction'}}</button>
   </form>
+
+  <div class="product-table">
+  	<div class="text-center mt-4">
+      <h4>Recent Transaction Details(Last 10 transactions)</h4>
+    </div>
+    <div>
+      <a class="pull-right view-all-link" routerLink="/transaction/viewall">View All Transactions</a>
+    </div>
+    <div class="data-loader" *ngIf="isTransactionDetailsLoading || transactionDetails.length === 0">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTransactionDetailsLoading"></i>
+	  	<span class='fs2' *ngIf="transactionDetails.length === 0">No Results found</span>
+	</div>
+    <div class="table-responsive-md mb-4" *ngIf="!(isTransactionDetailsLoading || transactionDetails.length === 0)">
+      <table class="table">
+		  <thead class="thead-light text-center">
+		    <tr>
+		      <th scope="col">Actions</th>
+		      <th scope="col">Name</th>
+		      <th scope="col">Type</th>
+		      <th scope="col">Category</th>
+		      <th scope="col">Amount(₹)</th>
+		      <th scope="col">Transaction On</th> 
+		      <th scope="col">Date Created</th>
+		    </tr>
+		  </thead>
+		  <tbody class="text-center">
+		    <tr *ngFor="let data of transactionDetails">
+		      <th>
+		      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/transaction/{{data.transactionId}}"></i>
+		      </th>
+		      <td>{{data.name}}</td>
+		      <td>{{data.majorType}}</td>
+		      <td>{{data.type}}</td>
+		      <td>{{data.amount}}</td>
+		      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+		      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
+		    </tr>
+		  </tbody>
+	  </table>
+    </div>
+  </div>
+    <div class="backdrop" [ngClass]="{'show-backdrop': isModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isModalActive}" tabindex="-1" role="dialog" aria-labelledby="addCustomerLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <form #customerDataForm="ngForm">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="addCustomerLabel">{{isAddCustomerSuccess ? 'Confirmation' : 'Add Customer'}}</h5>
+		        <button *ngIf="!isAddCustomerInProgress" type="button" class="close" aria-label="Close">
+		          <span aria-hidden="true" (click)="closeModal()">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      	<div *ngIf="customerModalError" class="mt15">
+					<div class="alert alert-danger" role="alert">
+					  {{customerModalError}}
+					</div>
+				</div>
+				<div class="mt15">
+		        {{isAddCustomerSuccess ? 'Successfully Created a Customer!!' : 'Please provide below details to create a new Customer'}} </div>
+		        <div *ngIf="!isAddCustomerSuccess">
+			        <div class="row mt30">
+			        	<div class="col-6 form-group">
+				        	<label for="customername">Customer Name</label>
+				        	<input type="text" name="customername" id="customername" class="form-control" #customername="ngModel" [(ngModel)]="newCustomerData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
+				        	<field-error [control]="customername" customerror="Please enter Valid Name"></field-error>
+				        </div>
+			        </div>
+			        <h5 class="mt15">Optional</h5>
+			        <hr/>
+			        <div class="row">
+			        	<div class="col-12 form-group">
+				        	<label for="phoneCustomer">Phone</label>
+					      	<input type="text" name="phoneCustomer" id="phoneCustomer" class="form-control" #phoneCustomer="ngModel" [(ngModel)]="newCustomerData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
+					      	<field-error [control]="phoneCustomer" customerror="Only Numbers - 10 digits!!"></field-error>
+					    </div>
+			        	<div class="col-12 form-group">
+				        	<label for="addressCustomer">Address</label>
+							<input type="text" name="addressCustomer" id="addressCustomer" class="form-control" #addressCustomer="ngModel" [(ngModel)]="newCustomerData.address" placeholder="Address" ngModel minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
+					      	<field-error [control]="addressCustomer" customerror="Only characters with space , and - allowed"></field-error>
+					    </div>
+			        </div>
+			    </div>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-success" [disabled]="isAddCustomerInProgress" (click)="closeModal()">{{isAddCustomerSuccess ? 'Ok' : 'Close'}}</button>
+		        <button type="button" [disabled]="isAddCustomerInProgress || customerDataForm.invalid" *ngIf="!isAddCustomerSuccess" class="btn btn-success" (click)="addCustomer()"><i class='fa fa-spinner fa-spin' *ngIf="isAddCustomerInProgress"></i>{{isAddCustomerInProgress ? ' Adding...' : 'Add Customer'}}</button>
+		      </div>
+		  </form>
+	    </div>
+	  </div>
+	</div>
+	<div class="backdrop" [ngClass]="{'show-backdrop': isBillModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isBillModalActive}" tabindex="-1" role="dialog" aria-labelledby="billLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="billLabel">{{isView ? modalBillName : (isBillDeleteSuccess ? 'Confirmation': 'Confirm Delete')}}</h5>
+		        <button type="button" class="close" aria-label="Close">
+		          <span aria-hidden="true" (click)="closeBillModal()">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      	<div *ngIf="isView" class="container">
+		      		<img class="bill-size-modal-body" src="/api/json/getBillImage/{{modalBillName}}" alt="Bill image {{modalBillName}}"/>
+		      	</div>
+		      	<div *ngIf="!isView">{{isBillDeleteSuccess? 'Successfully deleted the bill ' + modalBillName : 'Are you sure about deleting the image ' + modalBillName + '?'}}</div>
+		      </div>
+		      <div class="modal-footer" *ngIf="!isView">
+		        <button type="button" class="btn btn-success" [disabled]="isBillDeleteInProgress" (click)="closeBillModal()">{{isBillDeleteSuccess ? 'Ok' : 'Close'}}</button>
+		        <button type="button" [disabled]="isBillDeleteInProgress" *ngIf="!isBillDeleteSuccess" class="btn btn-success" (click)="deleteBill()"><i class='fa fa-spinner fa-spin' *ngIf="isBillDeleteInProgress"></i>{{isBillDeleteInProgress ? ' Deleting...' : 'Delete Bill'}}</button>
+		      </div>
+	    </div>
+	  </div>
+	</div>
 </div>

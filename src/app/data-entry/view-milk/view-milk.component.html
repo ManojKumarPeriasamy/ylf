@@ -1,0 +1,154 @@
+<div class="view-milk-container">
+	<h1>
+		Milk Entry
+	</h1>
+	<hr/>
+	<div class="data-loader" *ngIf="isMilkDataLoading || (milkData | json) == '{}'">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isMilkDataLoading"></i>
+	  	<span class='fs2' *ngIf="(milkData | json) == '{}'">No Data found</span>
+	</div>
+    <div *ngIf="!(isMilkDataLoading || (milkData | json) == '{}')">
+    	<div class="clearfix" *ngIf="!isEditMode">
+	    	<div class="pull-right delete-icon" (click)="openModal()" tabindex="0">
+	    		<i class='fa fa-trash'></i>
+		  		<span>Delete</span>
+	    	</div>
+	    	<div class="pull-right edit-icon" (click)="editEntry()" tabindex="0">
+	    		<i class='fa fa-pencil'></i>
+		  		<span>Edit</span>
+	    	</div>
+    	</div>
+    	<div class="row">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Name</h6>
+    			<span>{{milkData.name}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Entry Type</h6>
+    			<span>{{milkData.entryType}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Session</h6>
+    			<span>{{milkData.time}}</span>
+    		</div>
+    	</div>
+    	<div class="row" *ngIf="!isEditMode">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Number Of Litres</h6>
+    			<span>{{milkData.litres}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Price/Litre</h6>
+    			<span>{{milkData.pricePerLitre}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Amount</h6>
+    			<span><b>₹</b> {{milkData.amount}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Fat Content</h6>
+    			<span>{{milkData.fatContent}}</span>
+    		</div>
+    	</div>
+    	<div class="row mt30" *ngIf="isEditMode">
+			<div class="col-xs-4 col-md-2 form-group">
+		        <label for="litres">No Of Litres</label>
+		      	<input type="text" name="litres" id="litres" class="form-control" #litres="ngModel" [(ngModel)]="editData.litres" (ngModelChange)="calculateAmount()" placeholder="litres" ngModel required pattern="[0-9.]*">
+		      	<field-error [control]="litres" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-xs-4 col-md-2 form-group">
+		        <label for="pricePerLitre">Price/Litre</label>
+		        <div class="input-group">
+					<div class="input-group-prepend">
+				    	<span class="input-group-text">₹</span>
+				  	</div>
+		      		<input type="text" name="pricePerLitre" id="pricePerLitre" class="form-control" #pricePerLitre="ngModel" [(ngModel)]="editData.pricePerLitre" (ngModelChange)="calculateAmount()" placeholder="Name" ngModel required pattern="[0-9.]*">
+		      	</div>
+		      	<field-error [control]="pricePerLitre" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+			<div class="col-xs-4 col-md-2 form-group">
+				<label for="inputAmount">Amount</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+				    	<span class="input-group-text">₹</span>
+				  	</div>
+					<input type="text" name="amount" [readonly]="true" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="editData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
+				</div>
+				<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label>Date</label>
+		      	<div class="input-group">
+		      		<input type="text" name="date" class="form-control col-4" [(ngModel)]="editData.eventOn.date" pattern="[0-9]{2,2}$" ngModel #date="ngModel"  placeholder="Date" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="month" class="form-control col-4" [(ngModel)]="editData.eventOn.month" pattern="[0-9]{2,2}$" ngModel #month="ngModel" placeholder="Month" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="year" class="form-control col-4" [(ngModel)]="editData.eventOn.year" pattern="[0-9]{4,4}$" ngModel #year="ngModel" placeholder="Year" required>
+				</div>
+				<field-error [control]="date" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+				<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+				<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
+			</div>
+			<div class="col-xs-12 col-md-6 form-group">
+		        <label for="fatContent">Fat Content</label>
+		      	<input type="text" name="fatContent" id="fatContent" class="form-control" #fatContent="ngModel" [(ngModel)]="editData.fatContent" placeholder="Fat Content" ngModel required pattern="[0-9.]*">
+		      	<field-error [control]="fatContent" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-12 form-group">
+				<label for="inputRemarks">Remarks(Optional)</label>
+				<input type="text" name="remarks" id="inputRemarks" class="form-control" [(ngModel)]="editData.remarks">
+		    </div>
+		</div>
+    	<div class="row" *ngIf="!isEditMode">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Entry On</h6>
+    			<span>{{milkData.eventOn.date + '-' + milkData.eventOn.month + '-' + milkData.eventOn.year}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Created On</h6>
+    			<span>{{moment(milkData.dateCreated).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="milkData.updatedOn">
+    			<h6>Last Updated On</h6>
+    			<span>{{moment(milkData.updatedOn).format("DD-MM-YYYY")}}</span>
+    		</div>
+    	</div>
+    	<div class="row" *ngIf="!isEditMode">
+    		<div class="col-xs-12 col-md-6 mt30">
+    			<h6>Remarks</h6>
+    			<span>{{milkData.remarks ? milkData.remarks : 'Not Available'}}</span>
+    		</div>
+    	</div>
+    </div>
+    <div *ngIf="isEditMode">
+    	<hr class="mt30" />
+    	<button type="button" [disabled]="isEditInProgress" class="btn btn-success ml15 btn-lg pull-right" (click)="cancelEdit()">Cancel</button>
+    	<button type="button" [disabled]="isEditInProgress || isEditDataChanged()" class="btn btn-success btn-lg ml15 pull-right" (click)="updateEntry()"><i class='fa fa-spinner fa-spin' *ngIf="isEditInProgress"></i>{{isEditInProgress ? ' Updating...' : 'Update'}}</button>
+    </div>
+
+    <div class="backdrop" [ngClass]="{'show-backdrop': isModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isModalActive}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="deleteModalLabel">{{isDeleteSuccess ? 'Confirmation' : 'Confirm Delete'}}</h5>
+	        <button type="button" class="close" aria-label="Close" *ngIf="!isDeleteInProgress">
+	          <span aria-hidden="true" (click)="closeModal()">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        {{isDeleteSuccess ? 'Successfully Deleted the entry!!' : 'You sure want to delete this Entry?'}}
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-success" [disabled]="isDeleteInProgress" (click)="closeModal()">{{isDeleteSuccess ? 'Ok' : 'Close'}}</button>
+	        <button type="button" [disabled]="isDeleteInProgress" *ngIf="!isDeleteSuccess" class="btn btn-success" (click)="deleteEntry()"><i class='fa fa-spinner fa-spin' *ngIf="isDeleteInProgress"></i>{{isDeleteInProgress ? ' Deleting...' : 'Yes, Delete'}}</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</div>

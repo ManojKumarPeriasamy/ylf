@@ -1,4 +1,6 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { ProfileService } from '../services/profile.service';
 
 @Component({
@@ -13,7 +15,7 @@ export class HeaderComponent implements OnInit {
   private userData: any = {};
   private isUserNavMenuOpen: boolean = false;
   private isPageNavMenuOpen: boolean = false;
-  constructor(private profile: ProfileService, private _eref: ElementRef) { }
+  constructor(private profile: ProfileService, private _eref: ElementRef, private router: Router) { }
 
   toggleMenu: boolean = false;
   ngOnInit() {
@@ -25,6 +27,11 @@ export class HeaderComponent implements OnInit {
       this.isUserNavMenuOpen = false;
       this.isPageNavMenuOpen = false;
     }
+  }
+
+  routerChange(route) {
+    this.router.navigate([route]);
+    this.hideMenuNav();
   }
 
   togglePageNavMenu () {

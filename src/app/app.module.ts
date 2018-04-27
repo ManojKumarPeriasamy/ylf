@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -23,11 +24,24 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 import { HomeComponent } from './home/home.component';
 import { CreateUserComponent } from './create-user/create-user.component';
 import { ContactUsComponent } from './contact-us/contact-us.component';
+
 import { FieldErrorComponent } from './field-error/field-error.component';
+
 import { TransactionComponent } from './transaction/transaction.component';
 import { DataEntryComponent } from './data-entry/data-entry.component';
 import { InvestmentComponent } from './investment/investment.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+
+import { ViewMilkAllComponent } from './data-entry/view-milk-all/view-milk-all.component';
+import { ViewTractorAllComponent } from './data-entry/view-tractor-all/view-tractor-all.component';
+import { ViewTractorComponent } from './data-entry/view-tractor/view-tractor.component';
+import { ViewMilkComponent } from './data-entry/view-milk/view-milk.component';
+
+import { ViewallInvestmentComponent } from './investment/viewall-investment/viewall-investment.component';
+import { ViewInvestmentComponent } from './investment/view-investment/view-investment.component';
+
+import { ViewTransactionComponent } from './transaction/view-transaction/view-transaction.component';
+import { ViewallTransactionComponent } from './transaction/viewall-transaction/viewall-transaction.component';
 
 /** route config **/
 const appRoutes: Routes = [
@@ -35,10 +49,22 @@ const appRoutes: Routes = [
   { path: 'contactUs', component: ContactUsComponent },
   { path: 'login', component: LoginComponent, canActivate: [AuthGuardService] },
   { path: 'createUser', component: CreateUserComponent, canActivate: [AuthGuardService]},
-  { path: 'investment', component: InvestmentComponent/*, canActivate: [AuthGuardService]*/},
-  { path: 'transaction', component: TransactionComponent/*, canActivate: [AuthGuardService]*/},
-  { path: 'data-entry', component: DataEntryComponent/*, canActivate: [AuthGuardService]*/},
-  { path: 'dashboard', component: DashboardComponent/*, canActivate: [AuthGuardService]*/},
+  
+  { path: 'investment/addInvestment', component: InvestmentComponent, canActivate: [AuthGuardService]},
+  { path: 'investment/viewall', component: ViewallInvestmentComponent, canActivate: [AuthGuardService]},
+  { path: 'investment/:id', component: ViewInvestmentComponent, canActivate: [AuthGuardService]},
+  
+  { path: 'transaction/addTransaction', component: TransactionComponent, canActivate: [AuthGuardService]},
+  { path: 'transaction/viewall', component: ViewallTransactionComponent, canActivate: [AuthGuardService]},
+  { path: 'transaction/:id', component: ViewTransactionComponent, canActivate: [AuthGuardService]},
+  
+  { path: 'product-entry', component: DataEntryComponent, canActivate: [AuthGuardService]},
+  { path: 'product-entry/tractor/all', component: ViewTractorAllComponent, canActivate: [AuthGuardService]},
+  { path: 'product-entry/milk/all', component: ViewMilkAllComponent, canActivate: [AuthGuardService]},
+  { path: 'product-entry/tractor/:id', component: ViewTractorComponent, canActivate: [AuthGuardService]},
+  { path: 'product-entry/milk/:id', component: ViewMilkComponent, canActivate: [AuthGuardService]},
+  
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuardService]},
   { path: '**', component: PageNotFoundComponent }
 ];
 
@@ -47,6 +73,7 @@ const appRoutes: Routes = [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    TypeaheadModule.forRoot(),
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true } // <-- debugging purposes only
@@ -66,7 +93,15 @@ const appRoutes: Routes = [
     TransactionComponent,
     DataEntryComponent,
     InvestmentComponent,
-    DashboardComponent
+    DashboardComponent,
+    ViewMilkAllComponent,
+    ViewTractorAllComponent,
+    ViewTractorComponent,
+    ViewMilkComponent,
+    ViewallInvestmentComponent,
+    ViewInvestmentComponent,
+    ViewTransactionComponent,
+    ViewallTransactionComponent
   ],
   providers: [
       ProfileService,

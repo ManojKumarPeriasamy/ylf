@@ -116,7 +116,7 @@ module.exports = {
 	},
 
 	validateDefaultNumber: function(number) {
-		if(number && number.toString() != "0") {
+		if(number && parseInt(number) != 0 && (/^[0-9.]+$/.test(number.toString()))) {
 			return true;
 		} else {
 			console.log("UTIL :: Default Number not changed");

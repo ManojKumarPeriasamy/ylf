@@ -16,3 +16,47 @@ hr {
 .transaction-btn {
 	margin-top: 2rem;
 }
+.ylf-field-error {
+	color: #dc3545;
+    margin-top: 5px;
+}
+.bill-delete-icon {
+	color: #dc3545;
+	cursor: pointer;
+}
+.bill-view-icon {
+	color: #28a745;
+	cursor: pointer;
+}
+.bill-size-modal-body {
+	height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+/** Add Customer modal styles **/
+.modal-body hr {
+	margin: 15px 0;
+}
+.add-customer-link {
+	font-size:14px;
+	color: #007bff;
+	cursor: pointer;
+	margin-top: 5px;
+}
+/** Recent entry table styles **/
+.product-table {
+	margin-top: 40px;
+}
+.view-all-link {
+	margin: 15px 10px 15px;
+}
+.product-view-link {
+	color: #28a745;
+	cursor: pointer;
+}
+.data-loader {
+	height: 200px;
+    padding: 80px 0px;
+    text-align: center;
+}

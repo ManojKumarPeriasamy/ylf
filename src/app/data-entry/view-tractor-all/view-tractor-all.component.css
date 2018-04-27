@@ -1,0 +1,12 @@
+.view-all-tractor-container {
+	  margin: 20px 0px 100px;
+}
+@media (min-width: 992px) { 
+	.view-all-tractor-container {
+	  margin: 60px 0px 100px;
+	}
+}
+.product-view-link {
+	color: #28a745;
+	cursor: pointer;
+}

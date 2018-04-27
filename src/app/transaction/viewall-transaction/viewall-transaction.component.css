@@ -1,0 +1,28 @@
+.view-all-transaction-container {
+	 margin: 20px 0px 100px;
+}
+@media (min-width: 992px) { 
+	.view-all-transaction-container {
+	  margin: 60px 0px 100px;
+	}
+}
+
+/** Recent entry table styles **/
+.nav-link {
+	cursor: pointer;
+}
+.product-table {
+	margin-top: 40px;
+}
+.view-all-link {
+	margin: 15px 10px 15px;
+}
+.product-view-link {
+	color: #28a745;
+	cursor: pointer;
+}
+.data-loader {
+	height: 200px;
+    padding: 80px 0px;
+    text-align: center;
+}

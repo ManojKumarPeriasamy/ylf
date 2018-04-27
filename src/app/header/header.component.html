@@ -26,17 +26,17 @@
   <div *ngIf="isUserNavMenuOpen" class="navbarmenu fixed-top">
   	<div class="container">
   		<div class="row">
-	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/dashboard" (click)="hideMenuNav()">Dashboard</a>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item" (click)="routerChange('/dashboard')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Dashboard</a>
 	  		</div>
-	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/config" (click)="hideMenuNav()">Config</a>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item" (click)="routerChange('/config')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Config</a>
 	  		</div>
-	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/createUser" (click)="hideMenuNav()">Create User</a>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item" (click)="routerChange('/createUser')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Create User</a>
 	  		</div>
-	  		<div class="col-xs-12 col-md-3 navbarmenu-item">
-	  			<a class="navbarmenu-link" href="javascript:void(0)" (click)="logout()">Logout</a>
+	  		<div class="col-xs-12 col-md-3 navbarmenu-item" (click)="logout()">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Logout</a>
 	  		</div>
 	  	</div>
 	</div>
@@ -44,14 +44,14 @@
   <div *ngIf="isPageNavMenuOpen" class="navbarmenu fixed-top">
   	<div class="container">
   		<div class="row">
-	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/investment" (click)="hideMenuNav()">Investments</a>
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item" (click)="routerChange('/investment/addInvestment')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Add Investments</a>
 	  		</div>
-	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/transaction" (click)="hideMenuNav()">Transactions</a>
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item" (click)="routerChange('/transaction/addTransaction')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Add Transactions</a>
 	  		</div>
-	  		<div class="col-xs-12 col-md-4 navbarmenu-item">
-	  			<a class="navbarmenu-link" routerLink="/data-entry" (click)="hideMenuNav()">Data Entry</a>
+	  		<div class="col-xs-12 col-md-4 navbarmenu-item" (click)="routerChange('/product-entry')">
+	  			<a class="navbarmenu-link" href="javascript:void(0);">Product Entry</a>
 	  		</div>
 	  	</div>
 	</div>

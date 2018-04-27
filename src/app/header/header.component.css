@@ -26,7 +26,12 @@
 	text-align: center;
 }
 .navbarmenu-item {
-	margin: 10px 0px;
+	padding: 10px 0px;
+  cursor: pointer;
+}
+.navbarmenu-item:hover {
+  background-color: #ccc;
+  border-radius: 15px;
 }
 .navbarmenu-link {
 	font-size: 1.0rem;

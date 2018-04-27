@@ -26,8 +26,11 @@ export class LoginComponent implements OnInit {
 
   signin() {
       this.callInProgress = true;
-      this.api.signin(this.user, () => {
+      this.api.signin(this.user, (err, data) => {
         this.callInProgress = false;
+        if (err) {
+            return;
+        }
       });
   }
 

@@ -16,7 +16,7 @@ export class CreateUserComponent implements OnInit {
     emailID: ''
   };
 
-  private newUser:any =  Object.assign({}, this.userModel);
+  private newUser:any =  JSON.parse(JSON.stringify(this.userModel));
   public countryCodes: any[] = ['1','91'];
   public userRoles: any[] = ['Admin', 'Manager', 'Member'];
 
@@ -33,7 +33,7 @@ export class CreateUserComponent implements OnInit {
   resetUserData() {
   	this.createUserForm.reset();
     setTimeout(() => {
-      this.newUser = Object.assign({}, this.userModel);
+      this.newUser = JSON.parse(JSON.stringify(this.userModel));
     }, 0);
   }
 

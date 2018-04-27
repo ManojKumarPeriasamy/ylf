@@ -1,0 +1,38 @@
+<div class="view-all-investment-container">
+	<h1>
+		List of Transactions
+	</h1>
+	<hr/>
+	<div class="data-loader" *ngIf="isInvestmentDetailsLoading || investmentDetails.length === 0">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isInvestmentDetailsLoading"></i>
+	  	<span class='fs2' *ngIf="investmentDetails.length === 0">No Results found</span>
+	</div>
+    <div class="table-responsive-md mb-4" *ngIf="!(isInvestmentDetailsLoading || investmentDetails.length === 0)">
+      <table class="table">
+		  <thead class="thead-light text-center">
+		    <tr>
+		      <th scope="col">Actions</th>
+		      <th scope="col">Name</th>
+		      <th scope="col">Type</th>
+		      <th scope="col">Category</th>
+		      <th scope="col">Amount(₹)</th>
+		      <th scope="col">Investment On</th> 
+		      <th scope="col">Date Created</th>
+		    </tr>
+		  </thead>
+		  <tbody class="text-center">
+		    <tr *ngFor="let data of investmentDetails">
+		      <th>
+		      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/investment/{{data.investmentId}}"></i>
+		      </th>
+		      <td>{{data.name}}</td>
+		      <td>{{data.majorType}}</td>
+		      <td>{{data.type}}</td>
+		      <td>{{data.amount}}</td>
+		      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+		      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
+		    </tr>
+		  </tbody>
+	  </table>
+    </div>
+</div>

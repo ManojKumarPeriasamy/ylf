@@ -4,7 +4,7 @@ module.exports = {
 
     // mongo connection config
     mongodbHost: 'localhost',
-    mongodbConnectionPort: '27017',
+    mongodbConnectionPort: 27017,
     mongodbName: 'ylaitfarmDb',
 
     // passport Auth
