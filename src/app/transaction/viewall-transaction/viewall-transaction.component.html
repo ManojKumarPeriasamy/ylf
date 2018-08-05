@@ -5,7 +5,7 @@
 	<hr/>
 	<div class="data-loader" *ngIf="isTransactionDetailsLoading || transactionDetails.length === 0">
       	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTransactionDetailsLoading"></i>
-	  	<span class='fs2' *ngIf="transactionDetails.length === 0">No Results found</span>
+	  	<span class='fs2' *ngIf="!isTransactionDetailsLoading && transactionDetails.length === 0">No Results found</span>
 	</div>
     <div class="table-responsive-md mb-4" *ngIf="!(isTransactionDetailsLoading || transactionDetails.length === 0)">
       <table class="table">

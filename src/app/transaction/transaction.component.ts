@@ -20,7 +20,7 @@ export class TransactionComponent implements OnInit {
       {name: 'Farm Income', types: ['Farm Product Sales']}
     ];
   private expenseCategories = [
-      {name: 'Dairy Expense', types: ['Salary', 'Medical', 'BOE', 'Local Conveyance', 'Transport Fare', 'Others']},
+      {name: 'Dairy Expense', types: ['Milk Purchase Settlement', 'Salary', 'Medical', 'BOE', 'Local Conveyance', 'Transport Fare', 'Others']},
       {name: 'Tractor Expense', types: ['Maintenance', 'Driver expense', 'Others']},
       {name: 'Farm Expense', types: ['Seeds Purchase', 'Lease settlement', 'Pesticides', 'Other Farm Expense']}
     ];
@@ -41,7 +41,6 @@ export class TransactionComponent implements OnInit {
       month: this.today.format('MM'),
       year: this.today.format('YYYY')
     },
-    billNo: '',
     billAttachment: [],
   	remarks: ''
   };
@@ -62,7 +61,8 @@ export class TransactionComponent implements OnInit {
   }
 
   public noResultTypeAhead = false;
-  public customerNameList: string[] = [];
+  public incomeNameList: string[] = [];
+  public expenseNameList: string[] = [];
   private customers: any[];
 
   ngOnInit() {
@@ -77,9 +77,18 @@ export class TransactionComponent implements OnInit {
           return;
         this.customers = data;
         this.customers.forEach(customer => {
-          this.customerNameList.push(customer.name);
+          this.pushUserByType(customer);
         })
     });
+  }
+
+  pushUserByType(customer) {
+    if(customer.type === 'Customer') {
+      this.incomeNameList.unshift(customer.name);
+    }
+    if(customer.type !== 'Investor') {
+      this.expenseNameList.unshift(customer.name);
+    }
   }
 
   typeaheadNoResults(event: boolean): void {
@@ -88,7 +97,6 @@ export class TransactionComponent implements OnInit {
   }
 
   onSelectTypeAhead(event): void {
-    console.log(event.item);
     this.transactionForm.form.controls.sourceName.setErrors(null);
   }
 
@@ -138,6 +146,7 @@ export class TransactionComponent implements OnInit {
   private isFileUploading: boolean = false;
 
   validateFile() {
+    this.isFileSelected = false;
     let file = this.fileInput.nativeElement;
     if (file.files && file.files[0]) {
       this.selectedFileName = file.files[0].name;
@@ -175,14 +184,21 @@ export class TransactionComponent implements OnInit {
   private isModalActive:boolean = false;
   private isAddCustomerSuccess:boolean = false;
   private customerModalError = '';
+  private userTypes = ['Customer', 'Investor', 'Driver', 'Vendor', 'Employee'];
+  private countryCodes: any[] = ['1','91'];
 
   @ViewChild('customerDataForm')
   private customerDataForm: NgForm;
 
   private customerDataModel = {
     name: '',
+    userType: 'Customer',
+    countryCode: '91',
     phone: '',
-    address: ''
+    address: '',
+    pricePerLitre: 0,
+    costPerUnit: 0,
+    costPerRoll: 0
   }
 
   private newCustomerData = JSON.parse(JSON.stringify(this.customerDataModel));
@@ -214,13 +230,13 @@ export class TransactionComponent implements OnInit {
         this.customerModalError = "Something went wrong. Please try again !!";
         return;
       }
-      if(res && res.success) {
+      if(res && res.reason && res.reason.code && res.reason.code === 11000) {
+        this.customerModalError = this.newCustomerData.userType + " already present, Go back and search or try different name."; 
+      } else if(res && res.success) {
         this.isAddCustomerSuccess = true;
-        this.customerNameList.unshift(res.data.name);
+        this.customerModalError = '';
+        this.pushUserByType(res.data);
         this.customers.unshift(res.data);
-        this.noResultTypeAhead = false;
-        this.newTransactionData.name = res.data.name;
-        this.transactionForm.form.controls.sourceName.setErrors(null);
       } else {
         this.customerModalError = res.reason;
       }

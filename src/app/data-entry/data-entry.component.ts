@@ -14,7 +14,7 @@ export class DataEntryComponent implements OnInit {
   private today = moment();
   private productDataModel = {
   	product: 'Milk',
-  	entryType: 'IN',
+  	entryType: 'OUT',
   	jobType: 'Plough',
   	phone: '',
   	name: '',
@@ -30,6 +30,7 @@ export class DataEntryComponent implements OnInit {
   	chargeableUnits: 0,
   	costPerUnit: 0,
   	driverExpense: 0,
+    driverName: '',
   	amount: 0,
   	fatContent: 0,
   	eventOn: {
@@ -65,7 +66,9 @@ export class DataEntryComponent implements OnInit {
   }
   
   public noResultTypeAhead = false;
+  public noResultTypeAheadDriver = false;
   public customerNameList: string[] = [];
+  public driverNameList: string[] = [];
   private customers: any[];
 
   ngOnInit() {
@@ -86,9 +89,17 @@ export class DataEntryComponent implements OnInit {
           return;
         this.customers = data;
         this.customers.forEach(customer => {
-          this.customerNameList.push(customer.name);
+          this.pushUserByType(customer);
         })
     });
+  }
+
+  pushUserByType(customer) {
+    if(customer.type === 'Customer') {
+      this.customerNameList.unshift(customer.name);
+    } else if(customer.type === 'Driver') {
+      this.driverNameList.unshift(customer.name);
+    }
   }
  
   typeaheadNoResults(event: boolean): void {
@@ -99,6 +110,15 @@ export class DataEntryComponent implements OnInit {
   onSelectTypeAhead(event): void {
     this.setCustomerDefault(event.item);
     this.productDataForm.form.controls.name.setErrors(null);
+  }
+
+  typeaheadNoResultsDriver(event: boolean): void {
+    this.noResultTypeAheadDriver = event;
+    this.productDataForm.form.controls.driverName.setErrors({'nomatch': true});
+  }
+
+  onSelectTypeAheadDriver(event): void {
+    this.productDataForm.form.controls.driverName.setErrors(null);
   }
 
   setCustomerDefault(customerName) {
@@ -159,7 +179,6 @@ export class DataEntryComponent implements OnInit {
 
   	this.api.addProduct(requestObject, (err, data) => {
       	this.callInProgress = false;
-      	console.log(err);
       	if(err) 
           return;
   	    this.resetProductData();
@@ -178,12 +197,16 @@ export class DataEntryComponent implements OnInit {
   private isModalActive:boolean = false;
   private isAddCustomerSuccess:boolean = false;
   private customerModalError = '';
+  private userTypes = ['Customer', 'Investor', 'Driver', 'Vendor', 'Employee'];
+  private countryCodes: any[] = ['1','91'];
 
   @ViewChild('customerDataForm')
   private customerDataForm: NgForm;
 
   private customerDataModel = {
     name: '',
+    userType: 'Customer',
+    countryCode: '91',
     phone: '',
     address: '',
     pricePerLitre: 0,
@@ -220,14 +243,13 @@ export class DataEntryComponent implements OnInit {
         this.customerModalError = "Something went wrong. Please try again !!";
         return;
       }
-      if(res && res.success) {
+      if(res && res.reason && res.reason.code && res.reason.code === 11000) {
+        this.customerModalError = this.newCustomerData.userType + " already present, Go back and search or try different name."; 
+      } else if(res && res.success) {
         this.isAddCustomerSuccess = true;
-        this.customerNameList.unshift(res.data.name);
+        this.customerModalError = '';
+        this.pushUserByType(res.data);
         this.customers.unshift(res.data);
-        this.noResultTypeAhead = false;
-        this.newProductData.name = res.data.name;
-        this.setCustomerDefault(res.data.name);
-        this.productDataForm.form.controls.name.setErrors(null);
       } else {
         this.customerModalError = res.reason;
       }

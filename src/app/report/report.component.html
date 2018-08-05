@@ -1,0 +1,57 @@
+<div class="report-container">
+	<h1 class="report-heading">{{customerName}}</h1>
+	<h6>{{customerType}}</h6>
+	<hr/>
+	<div class="data-loader" *ngIf="isCustomerReportDataLoading || customerReportData.length === 0">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isCustomerReportDataLoading"></i>
+	  	<span class='fs2' *ngIf="!isCustomerReportDataLoading && customerReportData.length === 0">No Data found</span>
+	</div>
+    <div *ngIf="!(isCustomerReportDataLoading || customerReportData.length === 0) && customerType === 'Customer'">
+    	<div class="row">
+    		<div class="col-3">
+    			<div class="report-blocks"></div>
+    		</div>
+    		<div class="col-3">
+    			<div class="report-blocks"></div>
+    		</div>
+    		<div class="col-3">
+    			<div class="report-blocks"></div>
+    		</div>
+    		<div class="col-3">
+    			<div class="report-blocks"></div>
+    		</div>
+    	</div>
+    	<div class="table-responsive-md mb-4">
+		      <table class="table">
+				  <thead class="thead-light text-center">
+				    <tr>
+				      <th scope="col"></th>
+				      <th scope="col-4">Entries</th>
+				      <th scope="col"></th>
+				      <th scope="col">Date Created</th>
+				      <th scope="col"></th>
+				      <th scope="col">IN(₹)</th>
+				      <th scope="col">OUT(₹)</th>
+				      <th scope="col">Balance(₹)</th>
+				    </tr>
+				  </thead>
+				  <tbody class="text-center">
+				    <tr [ngClass]="data.productId ? '' : 'table-primary'" *ngFor="let data of customerReportData; let i = index">
+				      <td>
+						<i class="fa fa-eye fa-fw report-item-view-link" routerLink="{{data.productId ? (data.product === 'Milk' ? '/product-entry/milk/' + data.productId : '/product-entry/tractor/' + data.productId): '/transaction/' + data.transactionId}}"></i>
+				      </td>
+				      <td>
+				      	{{data.productId || data.transactionId}}
+				      </td>
+				      <td></td>
+				      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
+				      <td></td>
+				      <td>{{(data.transactionId && data.majorType === 'Income') || (data.productId && data.entryType === 'IN') ? data.amount : ''}}</td>
+				      <td>{{(data.transactionId && data.majorType === 'Expense') || (data.productId && data.entryType !== 'IN') ? data.amount : ''}}</td>
+				      <td>{{data.calculatedBalance}}</td>
+				    </tr>
+				  </tbody>
+			  </table>
+		    </div>
+    </div>
+</div>

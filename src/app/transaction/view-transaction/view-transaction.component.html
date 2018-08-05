@@ -1,3 +1,252 @@
-<p>
-  view-transaction works!
-</p>
+<div class="view-transaction-container">
+	<h1>
+		{{id}}
+	</h1>
+	<hr/>
+	<div class="data-loader" *ngIf="isTransactionDataLoading || (transactionData | json) == '{}'">
+      	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTransactionDataLoading"></i>
+	  	<span class='fs2' *ngIf="!isTransactionDataLoading && (transactionData | json) == '{}'">No Data found</span>
+	</div>
+    <div *ngIf="!(isTransactionDataLoading || (transactionData | json) == '{}')">
+    	<div class="clearfix" *ngIf="!isEditMode">
+	    	<div class="pull-right delete-icon" (click)="openModal()" tabindex="0">
+	    		<i class='fa fa-trash'></i>
+		  		<span>Delete</span>
+	    	</div>
+	    	<div class="pull-right edit-icon" (click)="editEntry()" tabindex="0">
+	    		<i class='fa fa-pencil'></i>
+		  		<span>Edit</span>
+	    	</div>
+    	</div>
+    	<div class="row">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Name</h6>
+    			<span>{{transactionData.name}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Type</h6>
+    			<span>{{transactionData.majorType}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Category</h6>
+    			<span>{{transactionData.category}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Sub Category</h6>
+    			<span>{{transactionData.type}}</span>
+    		</div>
+    	</div>
+
+    	<div class="row" *ngIf="!isEditMode && transactionData.majorType === 'Income'">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Amount</h6>
+    			<span>{{transactionData.amount}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Entry On</h6>
+    			<span>{{transactionData.eventOn.date + '-' + transactionData.eventOn.month + '-' + transactionData.eventOn.year}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Created On</h6>
+    			<span>{{moment(transactionData.dateCreated).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="transactionData.updatedOn">
+    			<h6>Last Updated On</h6>
+    			<span>{{moment(transactionData.updatedOn).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="transactionData.createdBy || transactionData.updatedBy">
+    			<h6>{{transactionData.updatedBy ? 'Last Updated By' : 'Created By'}}</h6>
+    			<span>{{transactionData.updatedBy ? transactionData.updatedBy : transactionData.createdBy}}</span>
+    		</div>
+    	</div>
+    	<div class="row mt30" *ngIf="isEditMode && transactionData.majorType === 'Income'">
+			<div class="col-xs-12 col-md-6 form-group">
+				<label for="inputAmount">Amount</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+				    	<span class="input-group-text">₹</span>
+				  	</div>
+					<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="editData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
+				</div>
+				<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label>Date</label>
+		      	<div class="input-group">
+		      		<input type="text" name="date" class="form-control col-4" [(ngModel)]="editData.eventOn.date" pattern="[0-9]{2,2}$" ngModel #date="ngModel"  placeholder="Date" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="month" class="form-control col-4" [(ngModel)]="editData.eventOn.month" pattern="[0-9]{2,2}$" ngModel #month="ngModel" placeholder="Month" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="year" class="form-control col-4" [(ngModel)]="editData.eventOn.year" pattern="[0-9]{4,4}$" ngModel #year="ngModel" placeholder="Year" required>
+				</div>
+				<field-error [control]="date" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+				<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+				<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
+			</div>
+		    <div class="col-xs-12 col-md-12 form-group">
+				<label for="inputRemarks">Remarks(Optional)</label>
+				<input type="text" name="remarks" id="inputRemarks" class="form-control" [(ngModel)]="editData.remarks">
+		    </div>
+		</div>
+
+		<div class="row" *ngIf="!isEditMode && transactionData.majorType !== 'Income'">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Total Expense</h6>
+    			<span>{{transactionData.totalExpense}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Amount Paid</h6>
+    			<span>{{transactionData.amount}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="transactionData.billAttachment.length > 0">
+    			<h6>Attachments</h6>
+				<div class="row bill-item mt15" *ngFor="let attachment of transactionData.billAttachment">
+					<div class="bill-attachment-name" (click)="openBillModal(attachment.filename)" tabindex="0"><i class='fa fa-paperclip'></i> {{attachment.filename}}</div>
+				</div>
+    		</div>
+    	</div>
+    	<div class="row" *ngIf="!isEditMode && transactionData.majorType !== 'Income'">
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Entry On</h6>
+    			<span>{{transactionData.eventOn.date + '-' + transactionData.eventOn.month + '-' + transactionData.eventOn.year}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30">
+    			<h6>Created On</h6>
+    			<span>{{moment(transactionData.dateCreated).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="transactionData.updatedOn">
+    			<h6>Last Updated On</h6>
+    			<span>{{moment(transactionData.updatedOn).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="transactionData.createdBy || transactionData.updatedBy">
+    			<h6>{{transactionData.updatedBy ? 'Last Updated By' : 'Created By'}}</h6>
+    			<span>{{transactionData.updatedBy ? transactionData.updatedBy : transactionData.createdBy}}</span>
+    		</div>
+    	</div>
+    	<div class="row mt30" *ngIf="isEditMode && transactionData.majorType !== 'Income'">
+    		<div class="col-xs-12 col-md-6 form-group">
+				<label for="inputAmount">Total Expense</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+				    	<span class="input-group-text">₹</span>
+				  	</div>
+					<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="editData.totalExpense" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
+				</div>
+				<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-xs-12 col-md-6 form-group">
+				<label for="inputAmount">Amount Paid</label>
+				<div class="input-group">
+					<div class="input-group-prepend">
+				    	<span class="input-group-text">₹</span>
+				  	</div>
+					<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="editData.amount" placeholder="Transaction Amount" ngModel required pattern="[0-9.]*$">
+				</div>
+				<field-error [control]="amount" customerror="Numbers with decimal point!!"></field-error>
+		    </div>
+		    <div class="col-6 col-sm-6 col-md-3" *ngIf="editData.billAttachment.length > 0">
+    			<h6>Upload File</h6>
+    			<div class="custom-file">
+				    <input type="file" #fileInput class="custom-file-input" (change)="validateFile()" id="inputBill">
+				    <label class="custom-file-label" for="inputBill">{{selectedFileName}}</label>
+				</div>
+				<div class="ylf-field-error" *ngIf="uploadError">
+			  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
+			  		<span>{{uploadError}}</span>
+			    </div>
+			    <div class="row bill-item mt15" *ngFor="let attachment of editData.billAttachment">
+					<div class="bill-attachment-name" (click)="openBillModal(attachment.filename)" tabindex="0"><i class='fa fa-paperclip'></i> {{attachment.filename}}</div>
+					<div class="col-1 text-right bill-delete-icon" (click)="removeBill(attachment.filename)" tabindex="0">
+			    		<i class='fa fa-trash'></i>
+			    	</div>
+				</div>
+				<div class="clearfix">
+					<div class="pull-right mt15">
+						<button type="button" [disabled]="!isFileSelected" class="btn btn-small btn-success" (click)="upload()"><i class='fa fa-spinner fa-spin' *ngIf="isFileUploading"></i>{{isFileUploading ? ' Uploading' : 'Upload'}}</button>
+					</div>
+				</div>
+				
+    		</div>
+    	</div>
+    	<div class="row mt15" *ngIf="isEditMode && transactionData.majorType !== 'Income'">
+		    <div class="col-xs-12 col-md-6 form-group">
+		        <label>Date</label>
+		      	<div class="input-group">
+		      		<input type="text" name="date" class="form-control col-4" [(ngModel)]="editData.eventOn.date" pattern="[0-9]{2,2}$" ngModel #date="ngModel"  placeholder="Date" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="month" class="form-control col-4" [(ngModel)]="editData.eventOn.month" pattern="[0-9]{2,2}$" ngModel #month="ngModel" placeholder="Month" required>
+				  	<div class="input-group-prepend">
+				    	<span class="input-group-text">/</span>
+				  	</div>
+				  	<input type="text" name="year" class="form-control col-4" [(ngModel)]="editData.eventOn.year" pattern="[0-9]{4,4}$" ngModel #year="ngModel" placeholder="Year" required>
+				</div>
+				<field-error [control]="date" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+				<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+				<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
+			</div>
+		    <div class="col-xs-12 col-md-12 form-group">
+				<label for="inputRemarks">Remarks(Optional)</label>
+				<input type="text" name="remarks" id="inputRemarks" class="form-control" [(ngModel)]="editData.remarks">
+		    </div>
+		</div>
+
+    	<div class="row" *ngIf="!isEditMode">
+    		<div class="col-xs-12 col-md-6 mt30">
+    			<h6>Remarks</h6>
+    			<span>{{transactionData.remarks ? transactionData.remarks : 'Not Available'}}</span>
+    		</div>
+    	</div>
+    </div>
+    <div *ngIf="isEditMode">
+    	<hr class="mt30" />
+    	<button type="button" [disabled]="isEditInProgress" class="btn btn-success ml15 btn-lg pull-right" (click)="cancelEdit()">Cancel</button>
+    	<button type="button" [disabled]="isEditInProgress || isEditDataChanged()" class="btn btn-success btn-lg ml15 pull-right" (click)="updateEntry()"><i class='fa fa-spinner fa-spin' *ngIf="isEditInProgress"></i>{{isEditInProgress ? ' Updating...' : 'Update'}}</button>
+    </div>
+
+    <div class="backdrop" [ngClass]="{'show-backdrop': isModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isModalActive}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="deleteModalLabel">{{isDeleteSuccess ? 'Confirmation' : 'Confirm Delete'}}</h5>
+	        <button type="button" class="close" aria-label="Close" *ngIf="!isDeleteInProgress">
+	          <span aria-hidden="true" (click)="closeModal()">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        {{isDeleteSuccess ? 'Successfully Deleted the transaction!!' : 'You sure want to delete this Entry?'}}
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-success" [disabled]="isDeleteInProgress" (click)="closeModal()">{{isDeleteSuccess ? 'Ok' : 'Close'}}</button>
+	        <button type="button" [disabled]="isDeleteInProgress" *ngIf="!isDeleteSuccess" class="btn btn-success" (click)="deleteEntry()"><i class='fa fa-spinner fa-spin' *ngIf="isDeleteInProgress"></i>{{isDeleteInProgress ? ' Deleting...' : 'Yes, Delete'}}</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<div class="backdrop" [ngClass]="{'show-backdrop': isBillModalActive}"></div>
+	<!-- Modal -->
+	<div class="modal fade" [ngClass]="{'show enableModal': isBillModalActive}" tabindex="-1" role="dialog" aria-labelledby="billLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="billLabel">{{modalBillName}}</h5>
+	        <button type="button" class="close" aria-label="Close">
+	          <span aria-hidden="true" (click)="closeBillModal()">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="container">
+	      		<img class="bill-size-modal-body" src="/api/json/getBillImage/{{modalBillName}}" alt="Bill image {{modalBillName}}"/>
+	      	</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</div>

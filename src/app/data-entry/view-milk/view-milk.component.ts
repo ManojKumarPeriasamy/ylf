@@ -47,7 +47,7 @@ export class ViewMilkComponent implements OnInit {
 
         this.api.getProductById({id: this.id}, (err, data) => {
     			this.isMilkDataLoading = false;
-    			if(err) 
+          if(err) 
     				return;
     			this.milkData = data;
         });

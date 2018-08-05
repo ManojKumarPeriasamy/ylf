@@ -42,6 +42,7 @@ import { ViewInvestmentComponent } from './investment/view-investment/view-inves
 
 import { ViewTransactionComponent } from './transaction/view-transaction/view-transaction.component';
 import { ViewallTransactionComponent } from './transaction/viewall-transaction/viewall-transaction.component';
+import { ReportComponent } from './report/report.component';
 
 /** route config **/
 const appRoutes: Routes = [
@@ -64,6 +65,7 @@ const appRoutes: Routes = [
   { path: 'product-entry/tractor/:id', component: ViewTractorComponent, canActivate: [AuthGuardService]},
   { path: 'product-entry/milk/:id', component: ViewMilkComponent, canActivate: [AuthGuardService]},
   
+  { path: 'report/:customerType/:customerName', component: ReportComponent, canActivate: [AuthGuardService]},
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuardService]},
   { path: '**', component: PageNotFoundComponent }
 ];
@@ -101,7 +103,8 @@ const appRoutes: Routes = [
     ViewallInvestmentComponent,
     ViewInvestmentComponent,
     ViewTransactionComponent,
-    ViewallTransactionComponent
+    ViewallTransactionComponent,
+    ReportComponent
   ],
   providers: [
       ProfileService,

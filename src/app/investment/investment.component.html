@@ -6,21 +6,27 @@
       <i class="fa fa-arrow-down fa-fw investment-icon"></i>
     </div>
     <div class="row">
-	    <div class="col-xs-12 col-md-6 form-group">
+	    <div class="col-xs-12 col-md-3 form-group">
 	        <label for="inputType">Investment Type</label>
 	      	<select class="custom-select" id="inputType" name="type" [(ngModel)]="newInvestmentData.type" (ngModelChange)="typeChanged()">
 			    <option *ngFor="let type of investmentTypes" value="{{type}}">{{type}}</option>
 			</select>
 	    </div>
+	    <div class="col-xs-12 col-md-3 form-group">
+	        <label for="category">Investment Category</label>
+	      	<select class="custom-select" id="category" name="category" [(ngModel)]="newInvestmentData.category">
+			    <option *ngFor="let type of investmentCategories" value="{{type}}">{{type}}</option>
+			</select>
+	    </div>
 	    <div class="col-xs-12 col-md-6 form-group">
 	      <label for="inputName">Investment Source</label>
-	      <input type="text" name="name" id="inputName" class="form-control" #name="ngModel" [(ngModel)]="newInvestmentData.name" placeholder="Investment Source Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="investorNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
+	      <input type="text" name="name" id="inputName" class="form-control" #name="ngModel" [(ngModel)]="newInvestmentData.name" placeholder="Investment Source Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="customerNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
 	      	<div class="ylf-field-error" *ngIf="noResultTypeAhead">
 		  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
 		  		<span>No Results Found</span>
 		    </div>
 		    <div class="clearfix">
-		      	<div class="pull-right add-investor-link" (click)="openAddInvestorModal()" tabindex="0">
+		      	<div class="pull-right add-investor-link" (click)="openAddCustomerModal()" tabindex="0">
 			  		<span>+ Add Investor</span>
 		    	</div>
 		    </div>
@@ -35,7 +41,7 @@
 			  	</div>
 				<input type="text" name="amount" id="inputAmount" class="form-control" #amount="ngModel" [(ngModel)]="newInvestmentData.amount" placeholder="Investment Amount" ngModel required pattern="[0-9]*$">
 			</div>
-			<field-error [control]="amount" investorror="Numbers Only !! Please check"></field-error>
+			<field-error [control]="amount" customerror="Numbers Only !! Please check"></field-error>
 	    </div>
 	    <div class="col-xs-12 col-md-6 form-group">
 	        <label>Invested On</label>
@@ -50,16 +56,16 @@
 			  	</div>
 			  	<input type="text" name="year" class="form-control col-4" [(ngModel)]="newInvestmentData.eventOn.year" pattern="[0-9]{4,4}$" ngModel #year="ngModel" placeholder="Year" required>
 			</div>
-			<field-error [control]="date" investorror="Invalid Date - Numbers only!!! (00-31)"></field-error>
-			<field-error [control]="month" investorror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
-			<field-error [control]="year" investorror="Invalid Year - Numbers only"></field-error>
+			<field-error [control]="date" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+			<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+			<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-xs-12 col-md-6 form-group">
 			<label for="inputPurpose">Investment Purpose</label>
 			<input type="text" name="purpose" id="inputPurpose" class="form-control" #purpose="ngModel" [(ngModel)]="newInvestmentData.purpose" placeholder="Investment Purpose" ngModel required>
-			<field-error [control]="purpose" investorror="Numbers Only !! Please check"></field-error>
+			<field-error [control]="purpose" customerror="Numbers Only !! Please check"></field-error>
 	    </div>
 	</div>
 
@@ -80,16 +86,16 @@
 	        	<div class="input-group-prepend">
 			    	<span class="input-group-text">₹</span>
 			  	</div>
-		      	<input type="email" name="repayAmount" id="inputRepayAmount" class="form-control" #repayamount="ngModel" [(ngModel)]="loanDetail.amountBalance" (ngModelChange)="calcualteEMIAmount()" placeholder="Amount to Repay for Loan" ngModel required pattern="[0-9]*">
+		      	<input type="email" name="repayAmount" id="inputRepayAmount" class="form-control" #repayamount="ngModel" [(ngModel)]="loanDetail.totalRepayAmount" (ngModelChange)="calcualteEMIAmount()" placeholder="Amount to Repay for Loan" ngModel required pattern="[0-9]*">
 		      </div>
-		      <field-error [control]="repayamount" investorror="Only Numbers!!!"></field-error>
+		      <field-error [control]="repayamount" customerror="Only Numbers!!!"></field-error>
 		    </div>
 		</div>
 		<div class="row">
 			<div class="col-xs-6 col-md-3 form-group">
 				<label for="inputTerms">No of Terms</label>
 				<input type="text" name="terms" id="inputTerms" class="form-control" #terms="ngModel" [(ngModel)]="loanDetail.emiDetails.term" (ngModelChange)="calcualteEMIAmount()" placeholder="Investment Amount" ngModel required pattern="[0-9]*$">
-				<field-error [control]="terms" investorror="Numbers Only !! Please check"></field-error>
+				<field-error [control]="terms" customerror="Numbers Only !! Please check"></field-error>
 		    </div>
 		    <div class="col-xs-6 col-md-3 form-group">
 				<label for="inputEMIAmount">EMI Amount</label>
@@ -99,10 +105,10 @@
 			  		</div>
 					<input type="text" name="emiAmount" id="inputEMIAmount" class="form-control" #emiAmount="ngModel" [(ngModel)]="loanDetail.emiDetails.amount" placeholder="Investment Amount" ngModel required pattern="[0-9]*$" [readonly]="true">
 				</div>
-				<field-error [control]="emiAmount" investorror="Numbers Only !! Please check"></field-error>
+				<field-error [control]="emiAmount" customerror="Numbers Only !! Please check"></field-error>
 		    </div>
 		    <div class="col-xs-12 col-md-6 form-group">
-		        <label>EMI Paid On</label>
+		        <label>EMI Starts On</label>
 		      	<div class="input-group">
 		      		<input type="text" name="emidate" class="form-control col-4" [(ngModel)]="loanDetail.emiDetails.eventOn.date" pattern="[0-9]{2,2}$" ngModel #emidate="ngModel" placeholder="Date">
 				  	<div class="input-group-prepend">
@@ -114,16 +120,16 @@
 				  	</div>
 				  	<input type="text" name="emiyear" class="form-control col-4" [(ngModel)]="loanDetail.emiDetails.eventOn.year" pattern="[0-9]{4,4}$" ngModel #emiyear="ngModel" placeholder="Year" required>
 				</div>
-				<field-error [control]="emidate" investorror="Invalid Date - Numbers only!!! (00-31)"></field-error>
-				<field-error [control]="emimonth" investorror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
-				<field-error [control]="emiyear" investorror="Invalid Year - Numbers only"></field-error>
+				<field-error [control]="emidate" customerror="Invalid Date - Numbers only!!! (00-31)"></field-error>
+				<field-error [control]="emimonth" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
+				<field-error [control]="emiyear" customerror="Invalid Year - Numbers only"></field-error>
 			</div>
 		</div>
 		<div class="row">
 		    <div class="col-xs-12 col-md-6 form-group">
 		        <label for="inputRemindBefore">Remind Before(In Days)</label>
 		      	<input type="text" name="remindBefore" id="inputRemindBefore" class="form-control" #remindbefore="ngModel" [(ngModel)]="loanDetail.emiDetails.remindBefore" placeholder="In Days" ngModel required pattern="[0-9]*">
-		      	<field-error [control]="remindbefore" investorror="Only Numbers!!!"></field-error>
+		      	<field-error [control]="remindbefore" customerror="Only Numbers!!!"></field-error>
 		    </div>
 		    <div class="col-xs-12 col-md-6 form-group">
 		    	<label for="inputUser">User To Remind</label>
@@ -172,7 +178,7 @@
     </div>
     <div class="data-loader" *ngIf="isInvestmentDetailsLoading || investmentDetails.length === 0">
       	<i class='fa fa-spinner fa-spin fs4' *ngIf="isInvestmentDetailsLoading"></i>
-	  	<span class='fs2' *ngIf="investmentDetails.length === 0">No Results found</span>
+	  	<span class='fs2' *ngIf="!isInvestmentDetailsLoading && investmentDetails.length === 0">No Results found</span>
 	</div>
     <div class="table-responsive-md mb-4" *ngIf="!(isInvestmentDetailsLoading || investmentDetails.length === 0)">
       <table class="table">
@@ -190,11 +196,11 @@
 		  <tbody class="text-center">
 		    <tr *ngFor="let data of investmentDetails">
 		      <th>
-		      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/investment/{{data.investmentId}}"></i>
+		      	<i class="fa fa-eye fa-fw product-view-link" routerLink="/investment/{{data.transactionId}}"></i>
 		      </th>
 		      <td>{{data.name}}</td>
-		      <td>{{data.majorType}}</td>
 		      <td>{{data.type}}</td>
+		      <td>{{data.category}}</td>
 		      <td>{{data.amount}}</td>
 		      <td>{{data.eventOn.date + "-" + data.eventOn.month + "-" + data.eventOn.year}}</td>
 		      <td>{{moment(data.dateCreated).format("DD-MM-YYYY")}}</td>
@@ -208,48 +214,95 @@
 	<div class="modal fade" [ngClass]="{'show enableModal': isModalActive}" tabindex="-1" role="dialog" aria-labelledby="addInvestorLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
-	      <form #investorDataForm="ngForm">
+	      <form #customerDataForm="ngForm">
 		      <div class="modal-header">
-		        <h5 class="modal-title" id="addInvestorLabel">{{isAddInvestorSuccess ? 'Confirmation' : 'Add Investor'}}</h5>
-		        <button *ngIf="!isAddInvestorInProgress" type="button" class="close" aria-label="Close">
+		        <h5 class="modal-title" id="addCustomerLabel">{{isAddCustomerSuccess ? 'Confirmation' : 'Add Customer'}}</h5>
+		        <button *ngIf="!isAddCustomerInProgress" type="button" class="close" aria-label="Close">
 		          <span aria-hidden="true" (click)="closeModal()">&times;</span>
 		        </button>
 		      </div>
 		      <div class="modal-body">
-		      	<div *ngIf="investorModalError" class="mt15">
+		      	<div *ngIf="customerModalError" class="mt15">
 					<div class="alert alert-danger" role="alert">
-					  {{investorModalError}}
+					  {{customerModalError}}
 					</div>
 				</div>
 				<div class="mt15">
-		        {{isAddInvestorSuccess ? 'Successfully Created a Investor!!' : 'Please provide below details to create a new Investor'}} </div>
-		        <div *ngIf="!isAddInvestorSuccess">
+		        {{isAddCustomerSuccess ? 'Successfully Created a Customer!!' : 'Please provide below details to create a new Customer'}} </div>
+		        <div *ngIf="!isAddCustomerSuccess">
 			        <div class="row mt30">
 			        	<div class="col-6 form-group">
-				        	<label for="investorname">Investor Name</label>
-				        	<input type="text" name="investorname" id="investorname" class="form-control" #investorname="ngModel" [(ngModel)]="newInvestorData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
-				        	<field-error [control]="investorname" investorror="Please enter Valid Name"></field-error>
+				        	<label for="customername">Name</label>
+				        	<input type="text" name="customername" id="customername" class="form-control" #customername="ngModel" [(ngModel)]="newCustomerData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
+				        	<field-error [control]="customername" customerror="Please enter Valid Name"></field-error>
+				        </div>
+				        <div class="col-6 form-group">
+				        	<label for="customertype">User Type</label>
+				        	<select class="custom-select" id="customertype" name="customertype" [(ngModel)]="newCustomerData.userType">
+							    <option *ngFor="let userType of userTypes" value="{{userType}}">{{userType}}</option>
+							</select>
 				        </div>
 			        </div>
+			        	
 			        <h5 class="mt15">Optional</h5>
 			        <hr/>
 			        <div class="row">
 			        	<div class="col-12 form-group">
-				        	<label for="phoneInvestor">Phone</label>
-					      	<input type="text" name="phoneInvestor" id="phoneInvestor" class="form-control" #phoneInvestor="ngModel" [(ngModel)]="newInvestorData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
-					      	<field-error [control]="phoneInvestor" investorror="Only Numbers - 10 digits!!"></field-error>
+				        	<label for="phoneCustomer">Phone</label>
+				        	<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text">+</span>
+								</div>
+								<select class="custom-select form-control col-2" name="countryCode" [(ngModel)]="newCustomerData.countryCode">
+									<option *ngFor="let code of countryCodes" value="{{code}}">{{code}}</option>
+								</select>
+					      		<input type="text" name="phoneCustomer" id="phoneCustomer" class="form-control" #phoneCustomer="ngModel" [(ngModel)]="newCustomerData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
+					      	</div>
+					      	<field-error [control]="phoneCustomer" customerror="Only Numbers - 10 digits!!"></field-error>
 					    </div>
 			        	<div class="col-12 form-group">
-				        	<label for="addressInvestor">Address</label>
-							<input type="text" name="addressInvestor" id="addressInvestor" class="form-control" #addressInvestor="ngModel" [(ngModel)]="newInvestorData.address" placeholder="Address" ngModel minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
-					      	<field-error [control]="addressInvestor" investorror="Only characters with space , and - allowed"></field-error>
+				        	<label for="addressCustomer">Address</label>
+							<input type="text" name="addressCustomer" id="addressCustomer" class="form-control" #addressCustomer="ngModel" [(ngModel)]="newCustomerData.address" placeholder="Address" ngModel minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
+					      	<field-error [control]="addressCustomer" customerror="Only characters with space , and - allowed"></field-error>
+					    </div>
+			        </div>
+			        <div class="row" *ngIf="newCustomerData.userType === 'Customer'">
+			        	<div class="col-4 form-group">
+			        		<label for="pricePerLitreCustomer">Price/Litre</label>
+					        <div class="input-group">
+					        	<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="pricePerLitreCustomer" id="pricePerLitreCustomer" class="form-control" #pricePerLitreCustomer="ngModel" [(ngModel)]="newCustomerData.pricePerLitre" placeholder="Name" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="pricePerLitreCustomer" customerror="Numbers with decimal point!!"></field-error>
+			        	</div>
+			        	<div class="col-4 form-group">
+				        	<label for="costPerUnitCustomer">Cost/Unit</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerUnitCustomer" id="costPerUnitCustomer" class="form-control" #costPerUnitCustomer="ngModel" [(ngModel)]="newCustomerData.costPerUnit" placeholder="cost per unit" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerUnitCustomer" customerror="Numbers with decimal point!!!!"></field-error>
+				        </div>
+				        <div class="col-4 form-group">
+					        <label for="costPerRollCustomer">Cost/Roll</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerRollCustomer" id="costPerRollCustomer" class="form-control" #costPerRollCustomer="ngModel" [(ngModel)]="newCustomerData.costPerRoll" placeholder="cost per roll" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerRollCustomer" customerror="Numbers only!!"></field-error>
 					    </div>
 			        </div>
 			    </div>
 		      </div>
 		      <div class="modal-footer">
-		        <button type="button" class="btn btn-success" [disabled]="isAddInvestorInProgress" (click)="closeModal()">{{isAddInvestorSuccess ? 'Ok' : 'Close'}}</button>
-		        <button type="button" [disabled]="isAddInvestorInProgress || investorDataForm.invalid" *ngIf="!isAddInvestorSuccess" class="btn btn-success" (click)="addInvestor()"><i class='fa fa-spinner fa-spin' *ngIf="isAddInvestorInProgress"></i>{{isAddInvestorInProgress ? ' Adding...' : 'Add Investor'}}</button>
+		        <button type="button" class="btn btn-success" [disabled]="isAddCustomerInProgress" (click)="closeModal()">{{isAddCustomerSuccess ? 'Ok' : 'Close'}}</button>
+		        <button type="button" [disabled]="isAddCustomerInProgress || customerDataForm.invalid" *ngIf="!isAddCustomerSuccess" class="btn btn-success" (click)="addCustomer()"><i class='fa fa-spinner fa-spin' *ngIf="isAddCustomerInProgress"></i>{{isAddCustomerInProgress ? ' Adding...' : 'Add Customer'}}</button>
 		      </div>
 		  </form>
 	    </div>

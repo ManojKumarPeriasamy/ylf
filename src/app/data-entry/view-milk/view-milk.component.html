@@ -1,11 +1,11 @@
 <div class="view-milk-container">
 	<h1>
-		Milk Entry
+		{{id}}
 	</h1>
 	<hr/>
 	<div class="data-loader" *ngIf="isMilkDataLoading || (milkData | json) == '{}'">
       	<i class='fa fa-spinner fa-spin fs4' *ngIf="isMilkDataLoading"></i>
-	  	<span class='fs2' *ngIf="(milkData | json) == '{}'">No Data found</span>
+	  	<span class='fs2' *ngIf="!isMilkDataLoading && (milkData | json) == '{}'">No Data found</span>
 	</div>
     <div *ngIf="!(isMilkDataLoading || (milkData | json) == '{}')">
     	<div class="clearfix" *ngIf="!isEditMode">
@@ -94,8 +94,8 @@
 				<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
 			</div>
 			<div class="col-xs-12 col-md-6 form-group">
-		        <label for="fatContent">Fat Content</label>
-		      	<input type="text" name="fatContent" id="fatContent" class="form-control" #fatContent="ngModel" [(ngModel)]="editData.fatContent" placeholder="Fat Content" ngModel required pattern="[0-9.]*">
+		        <label for="fatContent">Fat Content(Optional)</label>
+		      	<input type="text" name="fatContent" id="fatContent" class="form-control" #fatContent="ngModel" [(ngModel)]="editData.fatContent" placeholder="Fat Content" ngModel pattern="[0-9.]*">
 		      	<field-error [control]="fatContent" customerror="Numbers with decimal point!!"></field-error>
 		    </div>
 		    <div class="col-xs-12 col-md-12 form-group">
@@ -115,6 +115,10 @@
     		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="milkData.updatedOn">
     			<h6>Last Updated On</h6>
     			<span>{{moment(milkData.updatedOn).format("DD-MM-YYYY")}}</span>
+    		</div>
+    		<div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="milkData.createdBy || milkData.updatedBy">
+    			<h6>{{milkData.updatedBy ? 'Last Updated By' : 'Created By'}}</h6>
+    			<span>{{milkData.updatedBy ? milkData.updatedBy : milkData.createdBy}}</span>
     		</div>
     	</div>
     	<div class="row" *ngIf="!isEditMode">

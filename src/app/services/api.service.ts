@@ -20,12 +20,18 @@ export class ApiService {
 
   public onSuccess(res, cb, message, callName) {
       if(res && res.success) {
-          cb(null, res.data);
-          this.alert.removeAlert();
-          if(message) {
-              this.alert.setAlert("SUCCESS", message);
+          if(res.data) {
+            cb(null, res.data);
+            this.alert.removeAlert();
+            if(message) {
+                this.alert.setAlert("SUCCESS", message);
+            }
+            return;
+          } else {
+            cb(true);
+            this.alert.setAlert("ERROR", "Requested Data Not present !!!");
+            return;
           }
-          return;
       } else if (res.reason) {
           cb(true);
           var errorMessage = "Something Went Wrong, Please try after some time.";
@@ -190,6 +196,34 @@ export class ApiService {
     )
   }
 
+  /** get Transaction by ID **/
+  getTransactionById(query, callback) {
+    this.httpClient.get('/api/json/getTransactionById?id=' + query.id, { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        this.onSuccess(res, callback, "", "GetTransactionById");
+        return;
+      }, (error: any) => {
+        this.onError(error, callback);
+        return;
+      }
+    )
+  }
+
+  /** get List of Admins **/
+  getAdminList(callback) {
+    this.httpClient.get('/api/json/getAdminList', { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        this.onSuccess(res, callback, "", "GetAdminList");
+        return;
+      }, (error: any) => {
+        this.onError(error, callback);
+        return;
+      }
+    )
+  }
+
   /** delete Product by Id **/
   deleteProductById(query, callback) {
     this.httpClient.get('/api/json/deleteProductById?id=' + query.id, { headers: { Authorization: `${this.getToken()}` }})
@@ -204,12 +238,54 @@ export class ApiService {
     )
   }
 
+  /** delete Transaction by Id **/
+  deleteTransactionById(query, callback) {
+    this.httpClient.get('/api/json/deleteTransactionById?id=' + query.id, { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        this.onSuccess(res, callback, "", "deleteTransactionById");
+        return;
+      }, (error: any) => {
+        this.onError(error, callback);
+        return;
+      }
+    )
+  }
+
   /** Update milk data API **/
   updateMilkProductById(data, callback) {
     this.httpClient.post('/api/json/updateMilkProduct', data.updateObject, { headers: { Authorization: `${this.getToken()}` }})
     .subscribe(
       (res:any) => {
         this.onSuccess(res, callback, "Milk Data Updated Successfully !!!", "UpdateMilkData");
+        return;
+      }, (error: any) => {
+        this.onError(error, callback);
+        return;
+      }
+    )
+  }
+
+  /** Update Transaction data API **/
+  updateTransactionById(data, callback) {
+    this.httpClient.post('/api/json/updateTransactionById', data.updateObject, { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        this.onSuccess(res, callback, "Transaction Data Updated Successfully !!!", "UpdateTransactionData");
+        return;
+      }, (error: any) => {
+        this.onError(error, callback);
+        return;
+      }
+    )
+  }
+  
+  /** Update Investment data API **/
+  updateInvestmentById(data, callback) {
+    this.httpClient.post('/api/json/updateInvestmentById', data.updateObject, { headers: { Authorization: `${this.getToken()}` }})
+    .subscribe(
+      (res:any) => {
+        this.onSuccess(res, callback, "Investment Data Updated Successfully !!!", "UpdateInvestmentData");
         return;
       }, (error: any) => {
         this.onError(error, callback);
@@ -293,26 +369,12 @@ export class ApiService {
     )
   }
 
-  /** create new Investor **/
-  addNewInvestorData(reqData, callback) {
-    this.httpClient.post('/api/json/addInvestorData', reqData, { headers: { Authorization: `${this.getToken()}` }})
+  /** get Customer Report **/
+  getCustomerReport(query, callback) {
+    this.httpClient.get('/api/json/getCustomerReport/' + query.type + '/' + query.name, { headers: { Authorization: `${this.getToken()}` }})
     .subscribe(
       (res:any) => {
-        callback(null, res);
-        return;
-      }, (error: any) => {
-        callback(error);
-        return;
-      }
-    )
-  }
-
-  /** get Investor Details **/
-  getInvestors(callback) {
-    this.httpClient.get('/api/json/getInvestors', { headers: { Authorization: `${this.getToken()}` }})
-    .subscribe(
-      (res:any) => {
-        this.onSuccess(res, callback, "", "GetInvestorsData");
+        this.onSuccess(res, callback, "", query.name + "'s Customer Data");
         return;
       }, (error: any) => {
         this.onError(error, callback);

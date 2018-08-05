@@ -9,7 +9,7 @@ module.exports = {
             if (err) return cb("Something went wrong. Please try again later");
             bcrypt.hash(password, salt, null, function (err, hash) {
                 if (err) return cb("Something went wrong. Please try again later");
-                cb(null, hash)
+                cb(null, hash);
             });
         });
 	},
@@ -24,9 +24,10 @@ module.exports = {
 	getCurrentDate: function() {
 		return moment().toDate().getTime();
 	},
+	
 
 	validateName: function(name) {
-		if(name && name.length >= 4 && name.length <= 20 && (/^[a-zA-Z]+$/.test(name))) {
+		if(name && name.length >= 4 && name.length <= 20 && (/^[a-zA-Z \-]+$/.test(name))) {
 			return true;
 		} else {
 			console.log("UTIL :: Invalid Name");
@@ -87,7 +88,7 @@ module.exports = {
 		if(role == 'admin') {
 			return 'dashboard';
 		} else if(role == 'manager') {
-			return 'transaction';
+			return 'transaction/addTransaction';
 		} else {
 			return 'data-entry';
 		}
@@ -130,5 +131,9 @@ module.exports = {
 		} else {
 			return false;
 		}
+	},
+
+	momentFullDate: function(event) {
+		return moment([parseInt(event.year),parseInt(event.month)-1, parseInt(event.date)]).toDate().getTime();
 	}
 }

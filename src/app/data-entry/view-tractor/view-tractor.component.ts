@@ -24,6 +24,7 @@ export class ViewTractorComponent implements OnInit {
   	totalUnits: 0,
   	chargeableUnits: 0,
   	costPerUnit: 0,
+    driverName: '',
   	driverExpense: 0,
   	amount: 0,
   	noOfRolls: 0,
@@ -44,6 +45,8 @@ export class ViewTractorComponent implements OnInit {
   private isEditMode:boolean = false;
   private isEditInProgress:boolean = false;
 
+  private driverNameList = [];
+
   constructor(private api: ApiService, private route: ActivatedRoute, private router: Router, private alert: AlertService) {
   	this.moment = moment;
   }
@@ -53,10 +56,19 @@ export class ViewTractorComponent implements OnInit {
         this.id = params['id'];
 
         this.api.getProductById({id: this.id}, (err, data) => {
-    			this.isTractorDataLoading = false;
+          this.isTractorDataLoading = false;
     			if(err) 
     				return;
     			this.tractorData = data;
+        });
+        this.api.getCustomers((err, data) => {
+          if(err)
+            return;
+          data.forEach(customer => {
+            if(customer.type === 'Driver') {
+              this.driverNameList.unshift(customer.name);
+            }
+          })
         });
     });
   }
@@ -64,20 +76,21 @@ export class ViewTractorComponent implements OnInit {
   populateEditData(data) {
   	this.editData.jobType = data.jobType;
   	this.editData.startingUnit = data.startingUnit;
-	this.editData.endingUnit = data.endingUnit;
-	this.editData.totalUnits = data.totalUnits;
-	this.editData.chargeableUnits = data.chargeableUnits;
-	this.editData.costPerUnit = data.costPerUnit;
-	this.editData.driverExpense = data.driverExpense;
-	this.editData.noOfRolls = data.noOfRolls;
-	this.editData.costPerRoll = data.costPerRoll;
-	this.editData.amount = data.amount;
-	this.editData.eventOn.date = data.eventOn.date;
-	this.editData.eventOn.month = data.eventOn.month;
-	this.editData.eventOn.year = data.eventOn.year;
-	this.editData.address = data.address;
-	this.editData.remarks = data.remarks;
-	this.initialEditValue = JSON.stringify(this.editData);
+  	this.editData.endingUnit = data.endingUnit;
+  	this.editData.totalUnits = data.totalUnits;
+  	this.editData.chargeableUnits = data.chargeableUnits;
+  	this.editData.costPerUnit = data.costPerUnit;
+    this.editData.driverName = data.driverName;
+  	this.editData.driverExpense = data.driverExpense;
+  	this.editData.noOfRolls = data.noOfRolls;
+  	this.editData.costPerRoll = data.costPerRoll;
+  	this.editData.amount = data.amount;
+  	this.editData.eventOn.date = data.eventOn.date;
+  	this.editData.eventOn.month = data.eventOn.month;
+  	this.editData.eventOn.year = data.eventOn.year;
+  	this.editData.address = data.address;
+  	this.editData.remarks = data.remarks;
+  	this.initialEditValue = JSON.stringify(this.editData);
   }
 
   isEditDataChanged() {

@@ -17,6 +17,7 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			userData.createdBy = req.user ? req.user.username : 'NA';
 
 			dbHandlers.addUser(userData, function(dberr, users) {
 				if(dberr) {
@@ -69,14 +70,16 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			investmentData.createdBy = req.user ? req.user.username : 'NA';
+
 			var query = {'name' : investmentData.name};
 			var update = { '$inc' : {'investmentInvoice' : 1}};
-			dbHandlers.getNextInvestorSequenceValue(query, update, function(seqErr, sequenceDocument){
+			dbHandlers.getNextCustomerSequenceValue(query, update, function(seqErr, sequenceDocument){
 				if(seqErr) {
 					res.json(dataModel.errorResponse(seqErr));
 					return;
 				}
-				investmentData.investmentId = investmentData.name.toUpperCase() + '-' + investmentData.majorType.toUpperCase().substring(0, 3) + '-' + sequenceDocument.value.investmentInvoice;
+				investmentData.transactionId = investmentData.name.toUpperCase() + '-' + investmentData.majorType.toUpperCase().substring(0, 3) + '-' + sequenceDocument.value.investmentInvoice;
 				dbHandlers.addTransaction(investmentData, function(dberr, response) {
 					if(dberr) {
 						res.json(dataModel.errorResponse(dberr));
@@ -96,6 +99,8 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			transactionData.createdBy = req.user ? req.user.username : 'NA';
+
 			var query = {'name' : transactionData.name};
 			var update = { '$inc' : {'transactionInvoice' : 1}};
 			dbHandlers.getNextCustomerSequenceValue(query, update, function(seqErr, sequenceDocument){
@@ -124,6 +129,8 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			productEntry.createdBy = req.user ? req.user.username : 'NA';
+
 			var query = {'name' : productEntry.name};
 			var update = { '$inc' : {'productInvoice' : 1}};
 			dbHandlers.getNextCustomerSequenceValue(query, update, function(seqErr, sequenceDocument){
@@ -145,7 +152,7 @@ module.exports = {
 
 	getMilkDetails: function(req, res) {
 		console.log("ReqHan :: Inside Get Milk Details call -- " + JSON.stringify(req.query));
-		var query = {'product' : 'Milk'};
+		var query = {'productId' : {'$exists': true}, 'product' : 'Milk'};
 		var sortBy = {'dateCreated' : -1};
 		var limitValue = parseInt(req.query.limit);
 		var skipValue = req.query.start ? parseInt(req.query.start) : 0;
@@ -161,7 +168,7 @@ module.exports = {
 
 	getTractorDetails: function(req, res) {
 		console.log("ReqHan :: Inside Get Tractor Details call -- " + JSON.stringify(req.query));
-		var query = {'product' : 'Tractor'};
+		var query = {'productId' : {'$exists': true}, 'product' : 'Tractor'};
 		var sortBy = {'dateCreated' : -1};
 		var limitValue = parseInt(req.query.limit);
 		var skipValue = req.query.start ? parseInt(req.query.start) : 0;
@@ -225,8 +232,20 @@ module.exports = {
 
 	getTransactionById: function(req, res) {
 		console.log("ReqHan :: Inside Get Transaction Details by id -- " + JSON.stringify(req.query));
-		var query = {'trasactionId': req.query.id};
+		var query = {'transactionId': req.query.id};
 		dbHandlers.getTransactionById(query, function(dberr, response) {
+			if(dberr) {
+				res.json(dataModel.errorResponse(dberr));
+				return;
+			}
+
+			res.json(dataModel.successResponse(response));
+		});
+	},
+
+	getAdminList: function(req, res) {
+		console.log("ReqHan :: Inside Get Admin List");
+		dbHandlers.getAdminList(function(dberr, response) {
 			if(dberr) {
 				res.json(dataModel.errorResponse(dberr));
 				return;
@@ -269,6 +288,7 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			editData.updatedBy = req.user ? req.user.username : 'NA';
 
 			var query = {productId: req.body.id};
 			dbHandlers.updateProductData(query, editData, function(dberr, response) {
@@ -289,9 +309,52 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			editData.updatedBy = req.user ? req.user.username : 'NA';
 
 			var query = {productId: req.body.id};
 			dbHandlers.updateProductData(query, editData, function(dberr, response) {
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
+
+				res.json(dataModel.successResponse(response));
+			});
+		});
+	},
+
+	updateTrasactionDetail: function(req, res) {
+		console.log("ReqHan :: Inside Update Transaction by id -- " + JSON.stringify(req.body));
+		dataModel.verifyUpdateTransactionData(req.body.editData, function(modelErr, editData) {
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
+			editData.updatedBy = req.user ? req.user.username : 'NA';
+
+			var query = {transactionId: req.body.id};
+			dbHandlers.updateTransactionData(query, editData, function(dberr, response) {
+				if(dberr) {
+					res.json(dataModel.errorResponse(dberr));
+					return;
+				}
+
+				res.json(dataModel.successResponse(response));
+			});
+		});
+	},
+
+	updateInvestmentDetail: function(req, res) {
+		console.log("ReqHan :: Inside Update Investment by id -- " + JSON.stringify(req.body));
+		dataModel.verifyUpdateInvestmentData(req.body.editData, function(modelErr, editData) {
+			if(modelErr) {
+				res.json(dataModel.errorResponse(modelErr));
+				return;
+			}
+			editData.updatedBy = req.user ? req.user.username : 'NA';
+
+			var query = {transactionId: req.body.id};
+			dbHandlers.updateTransactionData(query, editData, function(dberr, response) {
 				if(dberr) {
 					res.json(dataModel.errorResponse(dberr));
 					return;
@@ -347,6 +410,7 @@ module.exports = {
 				res.json(dataModel.errorResponse(modelErr));
 				return;
 			}
+			customerData.createdBy = req.user ? req.user.username : 'NA';
 
 			dbHandlers.addCustomer(customerData, function(dberr, response) {
 				if(dberr) {
@@ -373,36 +437,51 @@ module.exports = {
 		});
 	},
 
-	addInvestor: function(req, res) {
-		console.log("ReqHan :: Inside Add Investor call -- " + JSON.stringify(req.body));
-		dataModel.investorDataModel(req.body.investorEntry, function(modelErr, investorData) {
-			if(modelErr) {
-				res.json(dataModel.errorResponse(modelErr));
-				return;
-			}
+	getCustomerReport: function(req, res) {
+		console.log("ReqHan :: Inside getCustomer Report -- " + JSON.stringify(req.params));
+		var data = {};
 
-			dbHandlers.addInvestor(investorData, function(dberr, response) {
-				if(dberr) {
-					res.json(dataModel.errorResponse(dberr));
-					return;
-				}
-
-				res.json(dataModel.successResponse(response));
-			});
-		})
-	},
-
-	getInvestors: function(req, res) {
-		console.log("ReqHan :: Inside Get investor call -- " + JSON.stringify(req.query));
-		var query = {};
-		var sortBy = {'dateCreated' : -1};
-		dbHandlers.getInvestors(query, sortBy, function(dberr, response) {
-			if(dberr) {
+		dbHandlers.getCustomer({'name': req.params.customerName, 'type': req.params.customerType}, function(dberr, customer) {
+		  	if(dberr) {
 				res.json(dataModel.errorResponse(dberr));
 				return;
 			}
+			if(!customer) {
+				res.json(dataModel.errorResponse("Data doesn't Exist for this user. Please retry with correct Data"));
+				return;
+			}
+			//data.customerDetails = customer;
+			var transactionQuery = {'name': req.params.customerName};
+			var sortBy = {'eventOn.fullDate' : -1};
 
-			res.json(dataModel.successResponse(response));
+			var transactionPromise = new Promise(function(resolve, reject) {
+			  dbHandlers.getTransactionsForCustomer(transactionQuery, sortBy, function(dberr, transactionEntry) {
+			  	if(dberr) {
+					reject(dberr);
+					return;
+				}
+				resolve(transactionEntry);
+			  });
+			});
+
+			var aggregateTransactionPromise = new Promise(function(resolve, reject) {
+			  dbHandlers.getAggregateCustomerResult(req.params.customerName, function(dberr, result) {
+			  	if(dberr) {
+					reject(dberr);
+					return;
+				}
+				resolve(result);
+			  });
+			});
+
+			Promise.all([transactionPromise, aggregateTransactionPromise]).then(function(output) {
+				data.reports = output[0];
+				data.aggregateResponse =output[1];
+				console.log(output[1]);
+				res.json(dataModel.successResponse(data));
+			}).catch(function(err){
+				res.json(dataModel.errorResponse(err));
+			})
 		});
-	}
+	},
 }

@@ -1,0 +1,36 @@
+.view-transaction-container {
+	  margin: 20px 0px 100px;
+}
+@media (min-width: 992px) {
+	.view-transaction-container {
+	  margin: 60px 0px 100px;
+	}
+}
+.ylf-field-error {
+	color: #dc3545;
+    margin-top: 5px;
+}
+.data-loader {
+	height: 200px;
+    padding: 80px 0px;
+    text-align: center;
+}
+.delete-icon, .edit-icon {
+	font-size:1.25rem;
+	color: #007bff;
+	cursor: pointer;
+	margin: 0px 15px 10px;
+}
+.bill-size-modal-body {
+	height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+.bill-delete-icon {
+	color: #dc3545;
+	cursor: pointer;
+}
+.bill-attachment-name {
+	cursor: pointer;
+	margin-left: 15px;
+}

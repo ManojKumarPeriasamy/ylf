@@ -14,6 +14,7 @@ export class InvestmentComponent implements OnInit {
   private today = moment();
   private investmentModel = {
     type: 'Own Investment',
+    category: 'Diary Investment',
     name: 'CAPITAL-SELF',
     amount: '',
     purpose: '',
@@ -26,7 +27,7 @@ export class InvestmentComponent implements OnInit {
     loanDetail: {}
   };
   private loanModel = {
-  	amountBalance: 0,
+  	totalRepayAmount: 0,
 	  loanStatus: 'Active',
   	emiDetails : {
   		term: 0,
@@ -46,8 +47,9 @@ export class InvestmentComponent implements OnInit {
   private loanDetail = JSON.parse(JSON.stringify(this.loanModel));
 
   public investmentTypes = ["Own Investment", "Bank Loan", "Loan From individual"];
+  public investmentCategories = ["Farm Investment", "Diary Investment", "Tractor Investment"]
   public loanStatus = ['Active'];
-  public adminUser = ['manoj'];
+  public adminUser = [];
   public showLoanInfo = false;
   public otherCustomError = "";
 
@@ -65,25 +67,38 @@ export class InvestmentComponent implements OnInit {
   }
 
   public noResultTypeAhead = false;
-  public investorNameList: string[] = [];
-  private investors: any[];
+  public customerNameList: string[] = [];
+  private customers: any[];
 
   ngOnInit() {
-  	this.loanDetail.emiDetails.userToRemind = this.adminUser[0];
     this.api.getInvestmentDetails({limit: this.loadDataLimit}, (err, data) => {
         this.isInvestmentDetailsLoading = false;
         if(err) 
           return;
         this.investmentDetails = data;
     });
-    this.api.getInvestors((err, data) => {
+    this.api.getCustomers((err, data) => {
         if(err)
           return;
-        this.investors = data;
-        this.investors.forEach(investor => {
-          this.investorNameList.push(investor.name);
+        this.customers = data;
+        this.customers.forEach(investor => {
+          this.pushUserByType(investor);
         })
     });
+    this.api.getAdminList((err, data) => {
+      if(err)
+        return;
+      data.forEach(admin => {
+          this.adminUser.push(admin.username);
+      })
+      this.loanDetail.emiDetails.userToRemind = this.adminUser[0];
+    });
+  }
+
+  pushUserByType(customer) {
+    if(customer.type === 'Investor') {
+      this.customerNameList.unshift(customer.name);
+    }
   }
 
   typeaheadNoResults(event: boolean): void {
@@ -112,7 +127,7 @@ export class InvestmentComponent implements OnInit {
   	if(repayAmount.pristine || repayAmount.errors || terms.pristine || terms.errors) {
   		return;
   	} else {
-  		this.loanDetail.emiDetails.amount = this.loanDetail.amountBalance / this.loanDetail.emiDetails.term;
+  		this.loanDetail.emiDetails.amount = this.loanDetail.totalRepayAmount / this.loanDetail.emiDetails.term;
   	}
   }
 
@@ -151,60 +166,66 @@ export class InvestmentComponent implements OnInit {
   }
 
   /** Add custome modal **/
-  private isAddInvestorInProgress:boolean = false;
+  private isAddCustomerInProgress:boolean = false;
   private isModalActive:boolean = false;
-  private isAddInvestorSuccess:boolean = false;
-  private investorModalError = '';
+  private isAddCustomerSuccess:boolean = false;
+  private customerModalError = '';
+  private userTypes = ['Customer', 'Investor', 'Driver', 'Vendor', 'Employee'];
+  private countryCodes: any[] = ['1','91'];
 
-  @ViewChild('investorDataForm')
-  private investorDataForm: NgForm;
+  @ViewChild('customerDataForm')
+  private customerDataForm: NgForm;
 
-  private investorDataModel = {
+  private customerDataModel = {
     name: '',
+    userType: 'Customer',
+    countryCode: '91',
     phone: '',
-    address: ''
+    address: '',
+    pricePerLitre: 0,
+    costPerUnit: 0,
+    costPerRoll: 0
   }
 
-  private newInvestorData = JSON.parse(JSON.stringify(this.investorDataModel));
+  private newCustomerData = JSON.parse(JSON.stringify(this.customerDataModel));
 
-  openAddInvestorModal() {
+  openAddCustomerModal() {
     this.isModalActive = true;
   }
 
   closeModal() {
-    this.isAddInvestorSuccess = false;
+    this.isAddCustomerSuccess = false;
     this.isModalActive = false;
-    this.investorModalError = '';
-    this.investorDataForm.reset();
-    this.newInvestorData = JSON.parse(JSON.stringify(this.investorDataModel));
+    this.customerModalError = '';
+    this.customerDataForm.reset();
+    this.newCustomerData = JSON.parse(JSON.stringify(this.customerDataModel));
   }
 
-  addInvestor() {
-    this.isAddInvestorInProgress = true;
+  addCustomer() {
+    this.isAddCustomerInProgress = true;
 
     var requestObject = {
-      investorEntry: {
+      customerEntry: {
       }
     }
-    requestObject.investorEntry = this.newInvestorData;
+    requestObject.customerEntry = this.newCustomerData;
 
-    this.api.addNewInvestorData(requestObject, (err, res) => {
-      this.isAddInvestorInProgress = false;
+    this.api.addNewCustomerData(requestObject, (err, res) => {
+      this.isAddCustomerInProgress = false;
       if(err) {
-        this.investorModalError = "Something went wrong. Please try again !!";
+        this.customerModalError = "Something went wrong. Please try again !!";
         return;
       }
-      if(res && res.success) {
-        this.isAddInvestorSuccess = true;
-        this.investorNameList.unshift(res.data.name);
-        this.investors.unshift(res.data);
-        this.noResultTypeAhead = false;
-        this.newInvestmentData.name = res.data.name;
-        this.investmentForm.form.controls.name.setErrors(null);
+      if(res && res.reason && res.reason.code && res.reason.code === 11000) {
+        this.customerModalError = this.newCustomerData.userType + " already present, Go back and search or try different name."; 
+      } else if(res && res.success) {
+        this.isAddCustomerSuccess = true;
+        this.customerModalError = '';
+        this.pushUserByType(res.data);
+        this.customers.unshift(res.data);
       } else {
-        this.investorModalError = res.reason;
+        this.customerModalError = res.reason;
       }
     });
   }
-
 }

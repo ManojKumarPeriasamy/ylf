@@ -42,7 +42,8 @@
 	<div class="row">
 		<div class="col-xs-12 col-md-6 form-group">
 	        <label for="inputSource">{{newTransactionData.transactionType === 'Income' ? 'Income From' : 'Paid To'}}</label>
-	      	<input type="text" name="sourceName" id="inputSource" class="form-control" #name="ngModel" [(ngModel)]="newTransactionData.name" placeholder="Transaction Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="customerNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
+	      	<input *ngIf="newTransactionData.transactionType === 'Income'" type="text" name="sourceName" id="inputSource" class="form-control" #name="ngModel" [(ngModel)]="newTransactionData.name" placeholder="Transaction Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="incomeNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
+	      	<input *ngIf="newTransactionData.transactionType !== 'Income'" type="text" name="sourceName" id="inputSource" class="form-control" #name="ngModel" [(ngModel)]="newTransactionData.name" placeholder="Transaction Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z -]*" [typeahead]="expenseNameList" (typeaheadNoResults)="typeaheadNoResults($event)" (typeaheadOnSelect)="onSelectTypeAhead($event)" autocomplete="off">
 	      	<div class="ylf-field-error" *ngIf="noResultTypeAhead">
 		  		<i class="fa fa-exclamation-circle fa-fw field-error-icon"></i>
 		  		<span>No Results Found</span>
@@ -93,15 +94,7 @@
 			<field-error [control]="month" customerror="Invalid Month - Numbers Only!!!(00-12)"></field-error>
 			<field-error [control]="year" customerror="Invalid Year - Numbers only"></field-error>
 		</div>
-	</div>
-
-	<div class="row" *ngIf="newTransactionData.transactionType !== 'Income'">
-		<div class="col-xs-12 col-md-6 form-group">
-	        <label for="billNo">Bill Number</label>
-	      	<input type="text" name="billNo" id="billNo" class="form-control" #billNo="ngModel" [(ngModel)]="newTransactionData.billNo" placeholder="Bill No #" ngModel required pattern="[0-9]*$">
-			<field-error [control]="billNo" customerror="Numbers Only !! Please check"></field-error>
-	    </div>
-	    <div class="col-xs-12 col-md-6 form-group">
+		<div class="col-xs-12 col-md-6 form-group" *ngIf="newTransactionData.transactionType !== 'Income'">
 	    	<label>Upload Bill</label>
 			<div class="custom-file">
 			    <input type="file" #fileInput class="custom-file-input" (change)="validateFile()" id="inputBill">
@@ -124,16 +117,13 @@
 			    	</div>
 				</div>
 			</div>
+			<div class="clearfix">
+				<div class="pull-right mt15">
+					<button type="button" [disabled]="!isFileSelected" class="btn btn-small btn-success" (click)="upload()"><i class='fa fa-spinner fa-spin' *ngIf="isFileUploading"></i>{{isFileUploading ? ' Uploading' : 'Upload'}}</button>
+				</div>
+			</div>
 		</div>
 	</div>
-
-	<div class="clearfix" *ngIf="newTransactionData.transactionType !== 'Income'">
-		<div class="pull-right">
-			<button type="button" [disabled]="!isFileSelected" class="btn btn-small btn-success" (click)="upload()"><i class='fa fa-spinner fa-spin' *ngIf="isFileUploading"></i>{{isFileUploading ? ' Uploading' : 'Upload'}}</button>
-		</div>
-	</div>
-
-
 
 	<div class="row">
 		<div class="col-xs-12 col-md-12">
@@ -154,7 +144,7 @@
     </div>
     <div class="data-loader" *ngIf="isTransactionDetailsLoading || transactionDetails.length === 0">
       	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTransactionDetailsLoading"></i>
-	  	<span class='fs2' *ngIf="transactionDetails.length === 0">No Results found</span>
+	  	<span class='fs2' *ngIf="!isTransactionDetailsLoading && transactionDetails.length === 0">No Results found</span>
 	</div>
     <div class="table-responsive-md mb-4" *ngIf="!(isTransactionDetailsLoading || transactionDetails.length === 0)">
       <table class="table">
@@ -208,23 +198,70 @@
 		        <div *ngIf="!isAddCustomerSuccess">
 			        <div class="row mt30">
 			        	<div class="col-6 form-group">
-				        	<label for="customername">Customer Name</label>
+				        	<label for="customername">Name</label>
 				        	<input type="text" name="customername" id="customername" class="form-control" #customername="ngModel" [(ngModel)]="newCustomerData.name" placeholder="Name" ngModel required minlength="4" maxlength="30" pattern="[a-zA-Z \-]*">
 				        	<field-error [control]="customername" customerror="Please enter Valid Name"></field-error>
 				        </div>
+				        <div class="col-6 form-group">
+				        	<label for="customertype">User Type</label>
+				        	<select class="custom-select" id="customertype" name="customertype" [(ngModel)]="newCustomerData.userType">
+							    <option *ngFor="let userType of userTypes" value="{{userType}}">{{userType}}</option>
+							</select>
+				        </div>
 			        </div>
+			        	
 			        <h5 class="mt15">Optional</h5>
 			        <hr/>
 			        <div class="row">
 			        	<div class="col-12 form-group">
 				        	<label for="phoneCustomer">Phone</label>
-					      	<input type="text" name="phoneCustomer" id="phoneCustomer" class="form-control" #phoneCustomer="ngModel" [(ngModel)]="newCustomerData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
+				        	<div class="input-group">
+								<div class="input-group-prepend">
+									<span class="input-group-text">+</span>
+								</div>
+								<select class="custom-select form-control col-2" name="countryCode" [(ngModel)]="newCustomerData.countryCode">
+									<option *ngFor="let code of countryCodes" value="{{code}}">{{code}}</option>
+								</select>
+					      		<input type="text" name="phoneCustomer" id="phoneCustomer" class="form-control" #phoneCustomer="ngModel" [(ngModel)]="newCustomerData.phone" placeholder="Phone #" ngModel pattern="[0-9]{10,10}">
+					      	</div>
 					      	<field-error [control]="phoneCustomer" customerror="Only Numbers - 10 digits!!"></field-error>
 					    </div>
 			        	<div class="col-12 form-group">
 				        	<label for="addressCustomer">Address</label>
 							<input type="text" name="addressCustomer" id="addressCustomer" class="form-control" #addressCustomer="ngModel" [(ngModel)]="newCustomerData.address" placeholder="Address" ngModel minlength="4" maxlength="80" pattern="[a-zA-Z0-9 \-,]*">
 					      	<field-error [control]="addressCustomer" customerror="Only characters with space , and - allowed"></field-error>
+					    </div>
+			        </div>
+			        <div class="row" *ngIf="newCustomerData.userType === 'Customer'">
+			        	<div class="col-4 form-group">
+			        		<label for="pricePerLitreCustomer">Price/Litre</label>
+					        <div class="input-group">
+					        	<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="pricePerLitreCustomer" id="pricePerLitreCustomer" class="form-control" #pricePerLitreCustomer="ngModel" [(ngModel)]="newCustomerData.pricePerLitre" placeholder="Name" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="pricePerLitreCustomer" customerror="Numbers with decimal point!!"></field-error>
+			        	</div>
+			        	<div class="col-4 form-group">
+				        	<label for="costPerUnitCustomer">Cost/Unit</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerUnitCustomer" id="costPerUnitCustomer" class="form-control" #costPerUnitCustomer="ngModel" [(ngModel)]="newCustomerData.costPerUnit" placeholder="cost per unit" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerUnitCustomer" customerror="Numbers with decimal point!!!!"></field-error>
+				        </div>
+				        <div class="col-4 form-group">
+					        <label for="costPerRollCustomer">Cost/Roll</label>
+					        <div class="input-group">
+								<div class="input-group-prepend">
+							    	<span class="input-group-text">₹</span>
+							  	</div>
+					      		<input type="text" name="costPerRollCustomer" id="costPerRollCustomer" class="form-control" #costPerRollCustomer="ngModel" [(ngModel)]="newCustomerData.costPerRoll" placeholder="cost per roll" ngModel pattern="[0-9.]*">
+					      	</div>
+					      	<field-error [control]="costPerRollCustomer" customerror="Numbers only!!"></field-error>
 					    </div>
 			        </div>
 			    </div>

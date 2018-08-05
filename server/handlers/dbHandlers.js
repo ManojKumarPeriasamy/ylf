@@ -52,7 +52,7 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
 
     dbHook.addProduct = function(productData, cb) {
         console.log("DbHandler :: Inside product entry User");
-        db.collection('dataentry').insertOne(productData, function(err, res) {
+        db.collection('transactions').insertOne(productData, function(err, res) {
             if(err) {
                 cb(err);
                 return;
@@ -63,7 +63,7 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
 
     dbHook.getProductDetails = function(query, sortValue, limitValue, skipValue, cb) {
         console.log("DbHandler :: Inside Get Product Details");
-        db.collection('dataentry').find(query).skip(skipValue).sort(sortValue).limit(limitValue).toArray(function(err, productData) {
+        db.collection('transactions').find(query).skip(skipValue).sort(sortValue).limit(limitValue).toArray(function(err, productData) {
             if(err) {
                 cb(err);
                 return;
@@ -96,7 +96,7 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
 
     dbHook.getProductById = function(query, cb) {
         console.log("DbHandler :: Inside Get Product By ID");
-        db.collection('dataentry').findOne(query, function(err, product) {
+        db.collection('transactions').findOne(query, function(err, product) {
             if(err) {
                 cb(err);
                 return;
@@ -116,9 +116,20 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
         })
     };
 
+    dbHook.getAdminList = function(cb) {
+        console.log("DbHandler :: Inside Get Admin List");
+        db.collection('users').find({'role' : 'admin'}).toArray(function(err, admins) {
+            if(err) {
+                cb(err);
+                return;
+            }
+            cb(null, admins);
+        })
+    };
+
     dbHook.deleteProductById = function(query, cb) {
         console.log("DbHandler :: Inside Delete Product By ID");
-        db.collection('dataentry').deleteOne(query, function(err, result) {
+        db.collection('transactions').deleteOne(query, function(err, result) {
             if(err) {
                 cb(err);
                 return;
@@ -140,7 +151,18 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
 
     dbHook.updateProductData = function(query, updateData,  cb) {
         console.log("DbHandler :: Inside Update Product Data By ID");
-        db.collection('dataentry').findOneAndUpdate(query, {$set: updateData}, {returnOriginal: false}, function(err, result) {
+        db.collection('transactions').findOneAndUpdate(query, {$set: updateData}, {returnOriginal: false}, function(err, result) {
+            if(err) {
+                cb(err);
+                return;
+            }
+            cb(null, result);
+        })
+    };
+
+    dbHook.updateTransactionData = function(query, updateData,  cb) {
+        console.log("DbHandler :: Inside Update Transaction Data By ID");
+        db.collection('transactions').findOneAndUpdate(query, {$set: updateData}, {returnOriginal: false}, function(err, result) {
             if(err) {
                 cb(err);
                 return;
@@ -211,26 +233,15 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
         })
     };
 
-    dbHook.addInvestor = function(investorData, cb) {
-        console.log("DbHandler :: Inside Add Investor Data");
-        db.collection('investor').insertOne(investorData, function(err, res) {
+    dbHook.getCustomer = function(query, cb) {
+        console.log("DbHandler :: Inside Get Customer Details");
+        db.collection('customer').findOne(query, function(err, customerData) {
             if(err) {
                 cb(err);
                 return;
             }
-            cb(null, res.ops[0]);
-        })
-    };
-
-    dbHook.getInvestors = function(query, sortValue, cb) {
-        console.log("DbHandler :: Inside Get Investor Details");
-        db.collection('investor').find(query).sort(sortValue).toArray(function(err, investorData) {
-            if(err) {
-                cb(err);
-                return;
-            }
-            cb(null, investorData);
-        })
+            cb(null, customerData);
+        });
     };
 
     dbHook.getNextCustomerSequenceValue = function(query, update, cb) {
@@ -243,13 +254,37 @@ MongoClient.connect('mongodb://' + config.mongodbHost + ':' + config.mongodbConn
         });
     };
 
-    dbHook.getNextInvestorSequenceValue = function(query, update, cb) {
-        db.collection('investor').findOneAndUpdate(query, update, {'new':true}, function(err, investor){
+    dbHook.getTransactionsForCustomer = function(query, sortValue, cb) {
+        console.log("DbHandler :: Inside Get Transaction Entry for Customer");
+        db.collection('transactions').find(query).sort(sortValue).toArray(function(err, transactionEntry) {
             if(err) {
                 cb(err);
                 return;
             }
-            cb(null, investor);
+            cb(null, transactionEntry);
+        })
+    };
+
+    dbHook.getAggregateCustomerResult = function(customerName, cb) {
+        console.log("DbHandler :: Inside Get aggregate result for Customer");
+        db.collection('transactions').aggregate([
+            {$match: {"name": customerName}},
+            {$group : {
+            _id : {
+               product : "$product",
+               entryType : "$entryType",
+               jobType : "$jobType",
+               majorType : "$majorType",
+               type : "$type",
+               category : "$category"
+            },
+            "amount": { "$sum": "$amount"}
+        }}]).toArray(function(err, aggregateData){
+            if(err) {
+                cb(err);
+                return;
+            }
+            cb(null, aggregateData);
         });
     };
 });

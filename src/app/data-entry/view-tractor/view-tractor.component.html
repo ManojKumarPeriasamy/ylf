@@ -1,11 +1,11 @@
 <div class="view-tractor-container">
 	<h1>
-		Tractor Entry
+		{{id}}
 	</h1>
 	<hr/>
 	<div class="data-loader" *ngIf="isTractorDataLoading || (tractorData | json) == '{}'">
       	<i class='fa fa-spinner fa-spin fs4' *ngIf="isTractorDataLoading"></i>
-	  	<span class='fs2' *ngIf="(tractorData | json) == '{}'">No Data found</span>
+	  	<span class='fs2' *ngIf="!isTractorDataLoading && (tractorData | json) == '{}'">No Data found</span>
 	</div>
     <div *ngIf="!(isTractorDataLoading || (tractorData | json) == '{}')">
     	<div class="clearfix" *ngIf="!isEditMode">
@@ -117,10 +117,6 @@
     			<h6>Amount</h6>
     			<span>{{tractorData.amount}}</span>
     		</div>
-    		<div class="col-6 col-sm-6 col-md-3 mt30">
-    			<h6>Driver Expense</h6>
-    			<span>{{tractorData.driverExpense}}</span>
-    		</div>
     	</div>
     	<div class="row" *ngIf="tractorData.jobType === 'Grass Baler'  && isEditMode">
     		<div class="col-6 col-sm-6 col-md-3 form-group">
@@ -148,17 +144,35 @@
 				</div>
 				<field-error [control]="amount" customerror="Invalid roll count or cost/roll!!"></field-error>
     		</div>
-    		<div class="col-6 col-sm-6 col-md-3 form-group">
-    			<label for="driverExpense">Drivers Expense</label>
-				<div class="input-group">
-					<div class="input-group-prepend">
-				    	<span class="input-group-text">₹</span>
-				  	</div>
-					<input type="text" name="driverExpense" id="driverExpense" class="form-control" #driverExpense="ngModel" [(ngModel)]="editData.driverExpense" placeholder="Driver Expense" ngModel required pattern="[0-9.]*">
-				</div>
-				<field-error [control]="driverExpense" customerror="Numbers with decimal point!!"></field-error>
-    		</div>
     	</div>
+        <div class="row" *ngIf="!isEditMode">
+            <div class="col-6 col-sm-6 col-md-3 mt30">
+                <h6>Driver Name</h6>
+                <span>{{tractorData.driverName}}</span>
+            </div>
+            <div class="col-6 col-sm-6 col-md-3 mt30">
+                <h6>Driver Expense</h6>
+                <span>{{tractorData.driverExpense}}</span>
+            </div>
+        </div>
+        <div class="row" *ngIf="isEditMode">
+            <div class="col-xs-6 col-md-3 form-group">
+                <label for="driverName">Driver Name</label>
+                <select class="custom-select" id="driverName" name="driverName" [(ngModel)]="editData.driverName">
+                    <option *ngFor="let driver of driverNameList" value="{{driver}}">{{driver}}</option>
+                </select>
+            </div>
+            <div class="col-6 col-sm-6 col-md-3 form-group">
+                <label for="driverExpense">Drivers Expense</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">₹</span>
+                    </div>
+                    <input type="text" name="driverExpense" id="driverExpense" class="form-control" #driverExpense="ngModel" [(ngModel)]="editData.driverExpense" placeholder="Driver Expense" ngModel required pattern="[0-9.]*">
+                </div>
+                <field-error [control]="driverExpense" customerror="Numbers with decimal point!!"></field-error>
+            </div>
+        </div>
     	<div class="row" *ngIf="!isEditMode">
     		<div class="col-6 col-sm-6 col-md-3 mt30">
     			<h6>Entry On</h6>
@@ -172,6 +186,10 @@
     			<h6>Last Updated On</h6>
     			<span>{{moment(tractorData.updatedOn).format("DD-MM-YYYY")}}</span>
     		</div>
+            <div class="col-6 col-sm-6 col-md-3 mt30" *ngIf="tractorData.createdBy || tractorData.updatedBy">
+                <h6>{{tractorData.updatedBy ? 'Last Updated By' : 'Created By'}}</h6>
+                <span>{{tractorData.updatedBy ? tractorData.updatedBy : tractorData.createdBy}}</span>
+            </div>
     	</div>
     	<div class="row" *ngIf="isEditMode">
     		<div class="col-xs-12 col-md-6 form-group">
